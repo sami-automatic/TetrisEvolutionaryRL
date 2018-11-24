@@ -4,10 +4,10 @@ import numpy as np
 import random
 
 shapes = {
-    'Z': [(0, 0), (-1, 0), (0, -1), (1, -1)],
-    
+    'I': [(0, 0), (0, -1), (0, -2), (0, -3)],
 }
-shape_names = ['Z']
+
+shape_names = ['I']
 
 
 def rotated(shape, cclk=False):
@@ -108,7 +108,11 @@ class TetrisEngine:
     def _new_piece(self):
         # Place randomly on x-axis with 2 tiles padding
         #x = int((self.width/2+1) * np.random.rand(1,1)[0,0]) + 2
-        self.anchor = (self.width / 2, 0)
+
+        # ATTENTION: Normally it's in the middle!
+        # self.anchor = (self.width / 2, 0)
+        self.anchor = (0, 0)
+        
         #self.anchor = (x, 0)
         self.shape = self._choose_shape()
 
@@ -149,10 +153,13 @@ class TetrisEngine:
         reward = self.valid_action_count()
         #reward = 1
 
+        cleared = 0
         done = False
         if self._has_dropped():
             self._set_piece(True)
-            reward += 10 * self._clear_lines()
+            cleared_lines = self._clear_lines()
+            reward += 10 * cleared_lines
+            cleared = cleared_lines
             if np.any(self.board[:, 0]):
                 self.clear()
                 self.n_deaths += 1
@@ -164,7 +171,7 @@ class TetrisEngine:
         self._set_piece(True)
         state = np.copy(self.board)
         self._set_piece(False)
-        return state, reward, done
+        return state, reward, done, cleared
 
     def clear(self):
         self.time = 0
