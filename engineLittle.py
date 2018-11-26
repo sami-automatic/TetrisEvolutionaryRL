@@ -64,10 +64,11 @@ def idle(shape, anchor, board):
 
 
 class TetrisEngine:
-    def __init__(self, width, height):
+    def __init__(self, width, height, board=[]):
+        print("board\n\n", board);
         self.width = width
         self.height = height
-        self.board = np.zeros(shape=(width, height), dtype=np.float)
+        self.board = board if len(board) > 0 else np.zeros(shape=(width, height), dtype=np.float)
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -135,7 +136,7 @@ class TetrisEngine:
     def valid_action_count(self):
         valid_action_sum = 0
 
-        for value, fn in self.value_action_map.items():
+        for _, fn in self.value_action_map.items():
             # If they're equal, it is not a valid action
             if fn(self.shape, self.anchor, self.board) != (self.shape, self.anchor):
                 valid_action_sum += 1
@@ -177,7 +178,7 @@ class TetrisEngine:
         self.time = 0
         self.score = 0
         self._new_piece()
-        self.board = np.zeros_like(self.board)
+        # self.board = np.zeros_like(self.board)
 
         return self.board
 
