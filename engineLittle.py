@@ -65,7 +65,6 @@ def idle(shape, anchor, board):
 
 class TetrisEngine:
     def __init__(self, width, height, board=[]):
-        print("board\n\n", board);
         self.width = width
         self.height = height
         self.board = board if len(board) > 0 else np.zeros(shape=(width, height), dtype=np.float)
