@@ -16,6 +16,7 @@ class Agent(object):
                 hole_penalty=-0.01,
                 blockade_penalty=-0.3,
                 bumpiness_penalty=-0.2):
+
         self.debug =  debug
         self.column_count =  column_count
         self.row_count =  row_count
@@ -62,6 +63,32 @@ class Agent(object):
             self.calculate_score(obs, cleared)
         print("\n============\nfinal state\n============\nobs: \n", obs, "\nreward:",reward, "\ndone:", done, "\n\n")
         return action_list
+
+    def get_attributes(self):
+	attributes = [
+		self.touches_another_block_reward, 
+        self.touches_floor_reward, 
+        self.touches_wall_reward, 
+        self.clear_line_reward,
+        self.height_multiplier_penalty,
+        self.hole_penalty,
+        self.blockade_penalty,
+        self.bumpiness_penalty]
+
+	return attributes
+
+    def set_attributes(self, attributes):
+	    self.touches_another_block_reward  = attributes[0]
+        self.touches_floor_reward          = attributes[1] 
+        self.touches_wall_reward           = attributes[2]
+        self.clear_line_reward		       = attributes[3]
+        self.height_multiplier_penalty	   = attributes[4]
+        self.hole_penalty                  = attributes[5]
+        self.blockade_penalty		       = attributes[6]
+        self.bumpiness_penalty             = attributes[7]
+	
+		
+	
 
     def calculate_edge(self, obs, i, j):
         point = 0.0     # cumulative point of edge
