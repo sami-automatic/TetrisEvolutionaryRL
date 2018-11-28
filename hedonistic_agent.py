@@ -1,4 +1,4 @@
-from engineLittle import TetrisEngine
+from engine import TetrisEngine
 from math import floor
 import numpy as np
 
