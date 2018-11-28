@@ -59,6 +59,7 @@ def rotate_right(shape, anchor, board):
     new_shape = rotated(shape, cclk=True)
     return (shape, anchor) if is_occupied(new_shape, anchor, board) else (new_shape, anchor)
 
+
 def idle(shape, anchor, board):
     return (shape, anchor)
 
@@ -67,7 +68,8 @@ class TetrisEngine:
     def __init__(self, width, height, board=[]):
         self.width = width
         self.height = height
-        self.board = board if len(board) > 0 else np.zeros(shape=(width, height), dtype=np.float)
+        self.board = board if len(board) > 0 else np.zeros(
+            shape=(width, height), dtype=np.float)
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -79,7 +81,8 @@ class TetrisEngine:
             5: rotate_right,
             6: idle,
         }
-        self.action_value_map = dict([(j, i) for i, j in self.value_action_map.items()])
+        self.action_value_map = dict(
+            [(j, i) for i, j in self.value_action_map.items()])
         self.nb_actions = len(self.value_action_map)
 
         # for running the engine
@@ -103,7 +106,7 @@ class TetrisEngine:
             r -= n
             if r <= 0:
                 self._shape_counts[i] += 1
-                return shapes[shape_names[i]] 
+                return shapes[shape_names[i]]
 
     def _new_piece(self):
         # Place randomly on x-axis with 2 tiles padding
@@ -112,7 +115,7 @@ class TetrisEngine:
         # ATTENTION: Normally it's in the middle!
         # self.anchor = (self.width / 2, 0)
         self.anchor = (0, 0)
-        
+
         #self.anchor = (x, 0)
         self.shape = self._choose_shape()
 
@@ -144,9 +147,11 @@ class TetrisEngine:
 
     def step(self, action):
         self.anchor = (int(self.anchor[0]), int(self.anchor[1]))
-        self.shape, self.anchor = self.value_action_map[action](self.shape, self.anchor, self.board)
+        self.shape, self.anchor = self.value_action_map[action](
+            self.shape, self.anchor, self.board)
         # Drop each step
-        self.shape, self.anchor = soft_drop(self.shape, self.anchor, self.board)
+        self.shape, self.anchor = soft_drop(
+            self.shape, self.anchor, self.board)
 
         # Update time and reward
         self.time += 1
@@ -185,12 +190,14 @@ class TetrisEngine:
         for i, j in self.shape:
             x, y = i + self.anchor[0], j + self.anchor[1]
             if x < self.width and x >= 0 and y < self.height and y >= 0:
-                self.board[int(self.anchor[0] + i), int(self.anchor[1] + j)] = on
+                self.board[int(self.anchor[0] + i),
+                           int(self.anchor[1] + j)] = on
 
     def __repr__(self):
         self._set_piece(True)
         s = 'o' + '-' * self.width + 'o\n'
-        s += '\n'.join(['|' + ''.join(['X' if j else ' ' for j in i]) + '|' for i in self.board.T])
+        s += '\n'.join(['|' + ''.join(['X' if j else ' ' for j in i]
+                                      ) + '|' for i in self.board.T])
         s += '\no' + '-' * self.width + 'o'
         self._set_piece(False)
         return s
