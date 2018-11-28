@@ -7,7 +7,6 @@ env = TetrisEngine(10, 20)
 agents = []
 rewards = []
 reward_agent_tuple = []
-reward_agent_list = []
 
 
 def create_random_agents():
@@ -26,12 +25,14 @@ def simulate(times):
 
 
 def play_all_agents():
+    global rewards
     for agent in agents:
         reward = play_one_game(agent)
         rewards.append(reward)
 
 
 def play_one_game(agent):
+    global env
     is_game_over = False
     environment = env.clear()
     reward_of_game = 0
@@ -44,17 +45,20 @@ def play_one_game(agent):
 
 
 def eliminate_half_of_agents():
-    global agents
-    reward_agent_tuple = zip(rewards, agents)
+    global agents, rewards, reward_agent_tuple
+    zipped = zip(rewards, agents)
+    reward_agent_list = list(zipped)
+    reward_agent_tuple = reward_agent_list[:]
     sorted(reward_agent_tuple, key=lambda x: x[0])
-    reward_agent_list = list(reward_agent_tuple)
-    agents = [reward_agent_list[i][1] for i in range(NUMBER_OF_AGENTS // 2)]
+    agents = [reward_agent_tuple[i][1] for i in range(NUMBER_OF_AGENTS // 2)]
 
 
 def cross_over_and_multiply():
+    global agents, reward_agent_tuple
     for i in range(NUMBER_OF_AGENTS // 2):
-        top = reward_agent_list[i][1]
-        bottom = reward_agent_list[i+1][1]
+        print(reward_agent_tuple)
+        top = reward_agent_tuple[i][1]
+        bottom = reward_agent_tuple[i+1][1]
         lhs = top.get_attributes()
         rhs = bottom.get_attributes()
         shuffled_attributes = [lhs[x] if np.random.randint(0, 9) % 2 == 0 else rhs[x] for x in range(8)]
@@ -64,5 +68,5 @@ def cross_over_and_multiply():
 
 
 create_random_agents()
-simulate(100)
-print(agents[0].get_attributes())
+simulate(10)
+# print(agents[0].get_attributes())
