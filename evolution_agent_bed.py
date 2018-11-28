@@ -11,9 +11,9 @@ reward_agent_tuple = []
 
 def create_random_agents():
     for _ in range(NUMBER_OF_AGENTS):
-        random_attributes = [np.random.uniform(-10.0, 10.0) for _ in range(8)]
+        random_genes = [np.random.uniform(-10.0, 10.0) for _ in range(8)]
         agent = Agent()
-        agent.set_attributes(random_attributes)
+        agent.set_genes(random_genes)
         agents.append(agent)
 
 
@@ -58,14 +58,25 @@ def cross_over_and_multiply():
     for i in range(len(agents) - 1):
         top = agents[i]
         bottom = agents[i+1]
-        lhs = top.get_attributes()
-        rhs = bottom.get_attributes()
-        shuffled_attributes = [lhs[x] if np.random.randint(0, 9) % 2 == 0 else rhs[x] for x in range(8)]
+        lhs = top.get_genes()
+        rhs = bottom.get_genes()
+        shuffled_genes = [lhs[x] if np.random.randint(0, 9) % 2 == 0 else rhs[x] for x in range(8)]
+        exposed_genes = expose_to_mutation(shuffled_genes)
         offspring = Agent()
-        offspring.set_attributes(shuffled_attributes)
+        offspring.set_genes(exposed_genes)
         agents.append(offspring)
+
+def expose_to_mutation(genes):
+        exposed_genes = []
+        for gene in genes:
+                mutation_happened = np.random.randint(0,9) == 9
+                if mutation_happened :
+                       exposed_genes.append(np.random.uniform(-10.0, 10.0))
+                else :
+                      exposed_genes.append(gene)
+        return exposed_genes  
 
 
 create_random_agents()
 simulate(10)
-# print(agents[0].get_attributes())
+# print(agents[0].get_genes())

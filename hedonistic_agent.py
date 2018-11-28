@@ -62,8 +62,8 @@ class Agent(object):
               obs, "\nreward:", reward, "\ndone:", done, "\n\n")
         return action_list
 
-    def get_attributes(self):
-        attributes = [
+    def get_genes(self):
+        genes = [
             self.touches_another_block_reward,
             self.touches_floor_reward,
             self.touches_wall_reward,
@@ -73,17 +73,17 @@ class Agent(object):
             self.blockade_penalty,
             self.bumpiness_penalty
         ]
-        return attributes
+        return genes
 
-    def set_attributes(self, attributes):
-        self.touches_another_block_reward = attributes[0]
-        self.touches_floor_reward = attributes[1]
-        self.touches_wall_reward = attributes[2]
-        self.clear_line_reward = attributes[3]
-        self.height_multiplier_penalty = attributes[4]
-        self.hole_penalty = attributes[5]
-        self.blockade_penalty = attributes[6]
-        self.bumpiness_penalty = attributes[7]
+    def set_genes(self, genes):
+        self.touches_another_block_reward = genes[0]
+        self.touches_floor_reward = genes[1]
+        self.touches_wall_reward = genes[2]
+        self.clear_line_reward = genes[3]
+        self.height_multiplier_penalty = genes[4]
+        self.hole_penalty = genes[5]
+        self.blockade_penalty = genes[6]
+        self.bumpiness_penalty = genes[7]
 
     def calculate_edge(self, obs, i, j):
         point = 0.0     # cumulative point of edge
