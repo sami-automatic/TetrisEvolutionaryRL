@@ -68,7 +68,7 @@ class TetrisEngine:
     def __init__(self, width, height, board=[]):
         self.width = width
         self.height = height
-        self.board = board if len(board) > 0 else np.zeros(
+        self.board = np.asarray(board, dtype=np.float32) if len(board) > 0 else np.zeros(
             shape=(width, height), dtype=np.float)
 
         # actions are triggered by letters
@@ -166,7 +166,7 @@ class TetrisEngine:
             reward += 10 * cleared_lines
             cleared = cleared_lines
             if np.any(self.board[:, 0]):
-                self.clear()
+                # self.clear()
                 self.n_deaths += 1
                 done = True
                 reward = -10
