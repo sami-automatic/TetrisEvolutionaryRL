@@ -29,6 +29,12 @@ class Agent(object):
         self.bumpiness_penalty = bumpiness_penalty
         self.mid = floor(row_count / 2)  # middle of the rows.
 
+    def __str__(self):
+        return  "\nAGENT: %s, %s, %s, %s, %s, %s, %s, %s \n" % (self.touches_another_block_reward, self.touches_floor_reward, self.touches_wall_reward, self.clear_line_reward, self.height_multiplier_penalty, self.hole_penalty, self.blockade_penalty, self.bumpiness_penalty) 
+
+    def __repr__(self):
+        return  "\nAGENT: %s, %s, %s, %s, %s, %s, %s, %s \n" % (self.touches_another_block_reward, self.touches_floor_reward, self.touches_wall_reward, self.clear_line_reward, self.height_multiplier_penalty, self.hole_penalty, self.blockade_penalty, self.bumpiness_penalty)         
+
     # 0: left,
     # 1: right,
     # 2: hard_drop,
@@ -64,10 +70,11 @@ class Agent(object):
         action_list = []
         env = TetrisEngine(self.row_count, self.column_count, state)
         obs = env.board
-
+        print("Initial state\n", obs)
         reward_action_pair = {}
         number = 4
         count = -1
+        is_game_over = False
         for execute in range(8):
             if (execute is not 4):
                 print("execute:", execute % 4, number)
@@ -76,13 +83,16 @@ class Agent(object):
                 continue
             for i in range(5):
                 for _ in range(execute % 4):
-                    obs, _, _, cleared = env.step(number)
-                    print(str(number) + ",", end=" ")
+                    obs, _, is_game_over, cleared = env.step(number)
+                    print("action: ", number, "\nSTATE:\n", obs)
+                    # print(str(number) + ",", end=" ")
                 for _ in range(i):
-                    obs, _, _, cleared = env.step(1)
-                    print("1,", end=" ")
-                obs, _, _, cleared = env.step(2)
-                print(2, end=" ")
+                    obs, _, is_game_over, cleared = env.step(1)
+                    print("action: ", 1, "\nSTATE:\n", obs)
+                    # print("1,", end=" ")
+                obs, _, is_game_over, cleared = env.step(2)
+                print("action: ", 2, "\nSTATE:\n", obs)
+                # print(2, end=" ")
                 count = count + 1
                 print("")
                 print("count: " + str(count), "execute: " + str(execute), "number: " + str(number))
@@ -108,7 +118,8 @@ class Agent(object):
         print("Actual actions sorted", actual_actions)
         print("\n\nFound! Returning..") 
         print(actual_actions[0])
-        return actual_actions[0]
+        print("With total reward: ", max_value) 
+        return actual_actions[0], max_value, is_game_over
 
     def get_genes(self):
         genes = [
@@ -215,10 +226,10 @@ class Agent(object):
 
 # Example usage
 # state = np.array([[0.]*20 for i in range(5)])
-state = [[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
-         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
-         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
-         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.]]
-hedonistic_agent = Agent()  # Agent(True) for debug output.
-hedonistic_agent.play(state)
+# state = [[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
+#          [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#          [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
+#          [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
+#          [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.]]
+# hedonistic_agent = Agent()  # Agent(True) for debug output.
+# hedonistic_agent.play(state)

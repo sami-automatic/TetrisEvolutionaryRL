@@ -4,10 +4,10 @@ import numpy as np
 import random
 
 shapes = {
-    'I': [(0, 0), (0, -1), (0, -2), (0, -3)],
+    'Z': [(0, 0), (-1, 0), (0, -1), (1, -1)],
 }
 
-shape_names = ['I']
+shape_names = ['Z']
 
 
 def rotated(shape, cclk=False):
