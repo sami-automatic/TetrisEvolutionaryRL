@@ -49,14 +49,16 @@ def play_one_game(agent):
     count = 0
     while not is_game_over:
         count += 1
-        actions, score, is_game_over = agent.play(environment)
+        actions, score = agent.play(environment)
         for action in actions:
-            environment, _, _, _ = env.step(action)
+            print("Playing", action, "in environment: \n", environment)
+            environment, _, is_game_over, _ = env.step(action)
+            print("Played", action, "in environment: \n", environment)
         print("\n\n\n\nactions", actions, "\n\n\n\n\n")
         reward_of_game += score
         print("Actions played, reward_of_game:", reward_of_game, "is game over?", is_game_over)
-        if (count % 100):
-            print("100 moves past, here is the current state: \n", environment)
+        if (is_game_over):
+            print("Game is over! Environment\n", environment)
     print("\n\n\n\n\n\n\n\n\ngame is over, returning.......\n", reward_of_game, "\n\n\n")
     env = TetrisEngine(5, 20)
     return reward_of_game

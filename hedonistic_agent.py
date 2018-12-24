@@ -83,14 +83,14 @@ class Agent(object):
                 continue
             for i in range(5):
                 for _ in range(execute % 4):
-                    obs, _, is_game_over, cleared = env.step(number)
+                    obs, _, _, cleared = env.step(number)
                     print("action: ", number, "\nSTATE:\n", obs)
                     # print(str(number) + ",", end=" ")
                 for _ in range(i):
-                    obs, _, is_game_over, cleared = env.step(1)
+                    obs, _, _, cleared = env.step(1)
                     print("action: ", 1, "\nSTATE:\n", obs)
                     # print("1,", end=" ")
-                obs, _, is_game_over, cleared = env.step(2)
+                obs, _, _, cleared = env.step(2)
                 print("action: ", 2, "\nSTATE:\n", obs)
                 # print(2, end=" ")
                 count = count + 1
@@ -119,7 +119,7 @@ class Agent(object):
         print("\n\nFound! Returning..") 
         print(actual_actions[0])
         print("With total reward: ", max_value) 
-        return actual_actions[0], max_value, is_game_over
+        return actual_actions[0], max_value
 
     def get_genes(self):
         genes = [
