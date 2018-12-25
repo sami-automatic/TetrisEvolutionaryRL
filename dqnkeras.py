@@ -1,4 +1,5 @@
-#My DQN implementation for tetris using keras
+#THIS CLASS IS NOT GONNA BE USED IN THE FIRST PART OF THE PROJECT SINCE IT USES KERAS
+#WE WILL MOVE FURTHER FOR THE FIRST TERM WITH THE OTHER DQN CLASS
 
 from __future__ import division
 import argparse

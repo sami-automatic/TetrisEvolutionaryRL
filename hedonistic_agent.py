@@ -105,14 +105,17 @@ class Agent(object):
         print("sorted_by_value", sorted_by_value, len(sorted_by_value), len(self.actions))
         max_value = sorted_by_value[0][1]
         print("max_value", max_value)
+
         max_value_array = [sorted_by_value[0][0]]
         for i in sorted_by_value[1:]:
             if (i[1] == max_value):
                 max_value_array.append(i[0])
         print("Max value array", max_value_array)
         actual_actions = []
+
         for i in max_value_array:
             actual_actions.append(self.actions[i])
+
         print("Actual actions", actual_actions)
         actual_actions = sorted(actual_actions, key=len)
         print("Actual actions sorted", actual_actions)
