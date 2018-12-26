@@ -46,7 +46,6 @@ class Agent(object):
     # Possibilities:
     # Can hard-drop to any location without any rotation. ((2), (1, 2), (1, 1, 2), ...)
     # Can rotate left or right in any given action list. ((4, 2), (4, 1, 2), (4, 1, 1, 2), ...)
-    # TODO: Play all possible combinations and get the biggest scored one.
     # 0 -- ( 2 ), ( 1, 2 ), ( 1, 1, 2 ), ( 1, 1, 1, 2 ), ( 1, 1, 1, 1, 2 )
     # 1 -- ( 4 ), ( 2 ), ( 1, 2 ), ( 1, 1, 2 ), ( 1, 1, 1, 2 ), ( 1, 1, 1, 1, 2 )
     # 2 -- ( 4 ), ( 4 ), ( 2 ), ( 1, 2 ), ( 1, 1, 2 ), ( 1, 1, 1, 2 ), ( 1, 1, 1, 1, 2 )

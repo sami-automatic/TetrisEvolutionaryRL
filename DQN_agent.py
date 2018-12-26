@@ -18,7 +18,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from engine import TetrisEngine
+from engine_DQN import TetrisEngine
 
 width, height = 10, 20 # standard tetris friends rules
 engine = TetrisEngine(width, height)
@@ -89,8 +89,12 @@ class DQN(nn.Module):
         self.head = nn.Linear(256, engine.nb_actions)
 
     def forward(self, x):
+        print("\n\n parameter x\n\n\n", x)
         x = F.relu(self.bn1(self.conv1(x)))
+        print("\n\n\nreturned -- 1 x\n\n\n", x)
+        # TODO: Buraya geri don
         x = F.relu(self.bn2(self.conv2(x)))
+        print("\n\n\nreturned -- 2 x\n\n\n", x)
         #x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.lin1(x.view(x.size(0), -1)))
         return self.head(x.view(x.size(0), -1))
@@ -116,7 +120,7 @@ class DQN(nn.Module):
 #    controls the rate of the decay.
 #
 
-BATCH_SIZE = 64
+BATCH_SIZE = 1
 GAMMA = 0.999
 EPS_START = 0.9
 EPS_END = 0.05
@@ -238,9 +242,9 @@ def optimize_model():
     for param in model.parameters():
         param.grad.data.clamp_(-1, 1)
     optimizer.step()
-    
-    if len(loss.data)>0 : return loss.data[0] 
-    else : return loss
+    return loss.item()
+    # if len(loss.data)>0 : return loss.data[0] 
+    # else : return loss
 
 def optimize_supervised(pred, targ):
     optimizer.zero_grad()
@@ -282,6 +286,8 @@ if __name__ == '__main__':
         else:
             print("=> no checkpoint found at '{}'".format(CHECKPOINT_FILE))
 
+    # print(count(start_epoch))
+    # sys.exit()
     ######################################################################
     #
     # Below, you can find the main training loop. At the beginning we reset
@@ -291,7 +297,20 @@ if __name__ == '__main__':
     # fails), we restart the loop.
 
     f = open('log.out', 'w+')
+    # num = 0
     for i_episode in count(start_epoch):
+        # num += 1
+        # if (num > 500000):
+        #     finish = raw_input("Finish? [y/n]")
+        #     if (finish is "y"):
+        #         break
+        #     elif (finish is "n"):
+        #         num = 0
+        #     else:
+        #         pass
+        # print(count(start_epoch))
+        # print(i_episode)
+
         # Initialize the environment and state
         state = FloatTensor(engine.clear()[None,None,:,:])
 
@@ -302,7 +321,7 @@ if __name__ == '__main__':
 
             # Observations
             last_state = state
-            state, reward, done = engine.step(action[0,0])
+            state, reward, done, cleared = engine.step(action[0,0])
             state = FloatTensor(state[None,None,:,:])
             
             # Accumulate reward
@@ -314,6 +333,7 @@ if __name__ == '__main__':
 
             # Perform one step of the optimization (on the target network)
             if done:
+                print("DONE DONE DONE ")
                 # Train model
                 if i_episode % 10 == 0:
                     log = 'epoch {0} score {1}'.format(i_episode, score)
@@ -340,4 +360,3 @@ if __name__ == '__main__':
     #env.close()
     #plt.ioff()
     #plt.show()
-

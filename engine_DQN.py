@@ -73,16 +73,16 @@ class TetrisEngine:
             shape=(width, height), dtype=np.float)
         
         #make those hard_coded from the best survived hedonistic agent
-        self.column_count = column_count
-        self.row_count = row_count
-        self.touches_another_block_reward = touches_another_block_reward
-        self.touches_floor_reward = touches_floor_reward
-        self.touches_wall_reward = touches_wall_reward
-        self.clear_line_reward = clear_line_reward
-        self.height_multiplier_penalty = height_multiplier_penalty
-        self.hole_penalty = hole_penalty
-        self.blockade_penalty = blockade_penalty
-        self.bumpiness_penalty = bumpiness_penalty
+        self.column_count = 20
+        self.row_count = 10
+        self.touches_another_block_reward = 182.06908759316752
+        self.touches_floor_reward = 197.80362431053217
+        self.touches_wall_reward = 11.101274843710573
+        self.clear_line_reward = 55.32199495763268
+        self.height_multiplier_penalty = -0.11704552783216822
+        self.hole_penalty = -0.41247700693381895
+        self.blockade_penalty = -0.2123814086602633
+        self.bumpiness_penalty = -0.18858682144007557
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -159,7 +159,7 @@ class TetrisEngine:
 
         return valid_action_sum
 
-    self.actions = [
+    actions = [
         [2], [1, 2], [1, 1, 2], [1, 1, 1, 2], [1, 1, 1, 1, 2],
         [4, 2], [4, 1, 2], [4, 1, 1, 2], [4, 1, 1, 1, 2], [4, 1, 1, 1, 1, 2],
         [4, 4, 2], [4, 4, 1, 2], [4, 4, 1, 1, 2], [4, 4, 1, 1, 1, 2], [4, 4, 1, 1, 1, 1, 2],
@@ -170,15 +170,17 @@ class TetrisEngine:
     ]
 
     def step(self, actions_code):
-        consecutive_actions = actions[actions_code]
+        consecutive_actions = self.actions[actions_code]
+        print("consecutive_actions", consecutive_actions)
         cleared = 0
 
         for action in consecutive_actions:
-            self.board,_,_,cleared_with_one_action = small_step(action)
+            board, done, cleared_with_one_action = self.small_step(action)
             cleared += cleared_with_one_action
         
-        state = np.copy(self.board)
-        full_reward = calculate_score(state,cleared)
+        state = np.copy(board)
+        full_reward = self.calculate_score(state,cleared)
+        print("State\n", state)
         return state, full_reward, done, cleared
 
     def small_step(self, action):
@@ -213,7 +215,7 @@ class TetrisEngine:
         self._set_piece(True)
         state = np.copy(self.board)
         self._set_piece(False)
-        return state, reward, done, cleared
+        return state, done, cleared
 
     def clear(self):
         self.time = 0
@@ -240,8 +242,8 @@ class TetrisEngine:
         return s
 
 
-###from hedonistic agent
-def calculate_score(self, obs, cleared):
+    ###from hedonistic agent
+    def calculate_score(self, obs, cleared):
         edge_score = 0.0
         hole_count = 0
         blockaded_count = 0
