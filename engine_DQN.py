@@ -221,7 +221,7 @@ class TetrisEngine:
         self.time = 0
         self.score = 0
         self._new_piece()
-        # self.board = np.zeros_like(self.board)
+        self.board = np.zeros_like(self.board)#deniz bunu niye kaldırdın lan
 
         return self.board
 
@@ -242,11 +242,12 @@ class TetrisEngine:
         return s
 
 
-    ###from hedonistic agent
+#from hedonistic agent
     def calculate_score(self, obs, cleared):
         edge_score = 0.0
         hole_count = 0
         blockaded_count = 0
+
         for (i, row) in enumerate(obs):
             for (j, cell) in enumerate(row):
                 # starting position of block. ignore!
@@ -265,10 +266,12 @@ class TetrisEngine:
                         hole_count += 1
         total_score, hole_score, bumpiness_score, blockaded_score = (0, 0, 0, 0)
         cleared_score = self.calculate_cleared_score(cleared)
+
         if cleared == 0:
             hole_score = self.calculate_hole_score(hole_count)
             bumpiness_score = self.calculate_bumpiness_score(obs)
             blockaded_score = self.calculate_blockaded_score(blockaded_count)
+
         print("cleared score:", cleared_score)
         total_score = edge_score + hole_score + \
             bumpiness_score + blockaded_score + cleared_score
@@ -321,3 +324,4 @@ class TetrisEngine:
 
     def calculate_cleared_score(self, cleared):
         return self.clear_line_reward * cleared
+

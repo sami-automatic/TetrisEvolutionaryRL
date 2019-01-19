@@ -1,77 +1,91 @@
-#THIS CLASS IS NOT GONNA BE USED IN THE FIRST PART OF THE PROJECT SINCE IT USES KERAS
-#WE WILL MOVE FURTHER FOR THE FIRST TERM WITH THE OTHER DQN CLASS
+#manuel DQN
 
-from __future__ import division
-import argparse
-from engine import TetrisEngine
-
-from PIL import Image
 import numpy as np
-import gym
-
+from keras.layers import Dense
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten, Convolution2D, Permute
 from keras.optimizers import Adam
-import keras.backend as K
+from keras.callbacks import deque
+import random
+from engine_DQN import TetrisEngine
 
-from rl.agents.dqn import DQNAgent
-from rl.policy import LinearAnnealedPolicy, BoltzmannQPolicy, EpsGreedyQPolicy
-from rl.memory import SequentialMemory
-from rl.core import Processor
-from rl.callbacks import FileLogger, ModelIntervalCheckpoint
+class DQNAgent:
 
-class TetrisProcessor(Processor):
-    def process_observation(self, observation):
-        #flatten the board to feed it in to DQN
-        processed_observation = observation.flatten()
-        return processed_observation
+    def __init__(self, state_size, action_size):
+        self.state_size = state_size
+        self.action_size = action_size
+        self.memory = deque(maxlen=20000)
+        self.gamma = 0.95    # discount rate
+        self.epsilon = 1.0  # exploration rate
+        self.epsilon_min = 0.01
+        self.epsilon_decay = 0.995
+        self.learning_rate = 0.001
+        self.model = self._build_model()
 
-    def process_state_batch(self, batch):
-        # We could perform this processing step in `process_observation`. In this case, however,
-        # we would need to store a `float32` array instead, which is 4x more memory intensive than
-        # an `uint8` array. This matters if we store 1M observations.
-        processed_batch = batch.astype(int)
-        return processed_batch
+    def _build_model(self):
+        # Neural Net for Deep-Q learning Model
+        model = Sequential()
+        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(24, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
+        model.compile(loss='mse',
+                      optimizer=Adam(lr=self.learning_rate))
+        return model
 
-    def process_reward(self, reward):
-        #DEniz we can implement the reward here coming from environment actually without changing the engine class
+    def remember(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
 
-        return reward
+    def act(self, state):
+        if np.random.rand() <= self.epsilon:
+            return random.randrange(self.action_size)
 
-# Get the environment and extract the number of actions.
-env = TetrisEngine(10,20)
-nb_actions = 20
-WINDOW_LENGTH = 4
+        act_values = self.model.predict(state)
+        return np.argmax(act_values[0])  # returns action
 
-model = Sequential()
-model.add(Dense(32, input_dim = self.state_size, activation = 'relu'))
-model.add(Dense(32), activation = 'relu')
-model.add(Dense(nb_actions, activation = 'linear'))
-model.compile(loss='mse',print(model.summary())
+    def replay(self, batch_size):
+        minibatch = random.sample(self.memory, batch_size)
 
-# Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
-# even the metrics!
-memory = SequentialMemory(limit=1000000, window_length=WINDOW_LENGTH)
-processor = TetrisProcessor()
+        for state, action, reward, next_state, done in minibatch:
+            target = reward
+            if not done:
+              target = reward + self.gamma * \
+                       np.amax(self.model.predict(next_state)[0])
+            target_f = self.model.predict(state)
+            target_f[0][action] = target
+            self.model.fit(state, target_f, epochs=1, verbose=0)
 
-# Select a policy. We use eps-greedy action selection, which means that a random action is selected
-# with probability eps. We anneal eps from 1.0 to 0.1 over the course of 1M steps. This is done so that
-# the agent initially explores the environment (high eps) and then gradually sticks to what it knows
-# (low eps). We also set a dedicated eps value that is used during testing. Note that we set it to 0.05
-# so that the agent still performs some random actions. This ensures that the agent cannot get stuck.
-policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., value_min=.1, value_test=.05,
-                              nb_steps=1000000)
+        if self.epsilon > self.epsilon_min:
+            self.epsilon *= self.epsilon_decay
 
-# The trade-off between exploration and exploitation is difficult and an on-going research topic.
-# If you want, you can experiment with the parameters or use a different policy. Another popular one
-# is Boltzmann-style exploration:
-# policy = BoltzmannQPolicy(tau=1.)
-# Feel free to give it a try!
+#Training of our DQN
 
-dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory,
-               processor=processor, nb_steps_warmup=50000, gamma=.99, target_model_update=10000,
-               train_interval=4, delta_clip=1.)
+if __name__ == "__main__":
+    # initialize gym environment and the agent
+    batch_size = 1000
+    nb_games = 500
+    env = TetrisEngine(5,10)
+    state_size = env.height*env.width
+    action_size = len(env.actions)
+    agent = DQNAgent(state_size, action_size)
 
-dqn.compile(Adam(lr=.00025), metrics=['mae'])
+    for g in range(nb_games):
+        # reset state in the beginning of each game
+        state = env.clear()
 
-dqn.fit(env, callbacks=callbacks, nb_steps=1750000, log_interval=10000)
+        for _ in range(500):
+
+            # Decide action
+            state_shaped = np.reshape(state, [1, 50])
+            action = agent.act(state_shaped)
+            next_state, reward, done, _ = env.step(action)
+            next_state_shaped = np.reshape(next_state, [1, 50])
+
+
+            agent.remember(state_shaped, action, reward, next_state_shaped, done)
+            state = next_state
+            if done:
+                # print the score and break out of the loop
+                print("episode: {}/{}, score: {}"
+                      .format(g, nb_games, reward))
+                break
+
+        agent.replay(batch_size)
