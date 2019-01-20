@@ -24,8 +24,8 @@ class DQNAgent:
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
         model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(24, activation='relu'))
+        model.add(Dense(34, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(34, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
@@ -42,6 +42,7 @@ class DQNAgent:
         return np.argmax(act_values[0])  # returns action
 
     def replay(self, batch_size):
+        #to try with iterative memory and random sampling
         minibatch = random.sample(self.memory, batch_size)
 
         for state, action, reward, next_state, done in minibatch:
@@ -60,32 +61,34 @@ class DQNAgent:
 
 if __name__ == "__main__":
     # initialize gym environment and the agent
+    nb_updates = 250
     batch_size = 1000
-    nb_games = 500
+    nb_games = 1000 # to play without changing cached Q function
     env = TetrisEngine(5,10)
     state_size = env.height*env.width
     action_size = len(env.actions)
     agent = DQNAgent(state_size, action_size)
+    f = open("test", "w+")
 
-    for g in range(nb_games):
-        # reset state in the beginning of each game
-        state = env.clear()
+    for u in range(nb_updates):
+        #the DQN is iterated with the same Q function nb_games times
+        for g in range(nb_games):
+            state = env.clear()
+            done = False
+            #play tetris until game over
+            while not done:
+                # Decide action
+                state_shaped = np.reshape(state, [1, 50])
+                action = agent.act(state_shaped)
+                next_state, reward, done, _ = env.step(action)
+                next_state_shaped = np.reshape(next_state, [1, 50])
 
-        for _ in range(500):
+                agent.remember(state_shaped, action, reward, next_state_shaped, done)
+                state = next_state
+            f.write("\n updates: ", u, "/", nb_updates," games: ", g, "/", nb_games," reward: ", reward)
 
-            # Decide action
-            state_shaped = np.reshape(state, [1, 50])
-            action = agent.act(state_shaped)
-            next_state, reward, done, _ = env.step(action)
-            next_state_shaped = np.reshape(next_state, [1, 50])
-
-
-            agent.remember(state_shaped, action, reward, next_state_shaped, done)
-            state = next_state
-            if done:
-                # print the score and break out of the loop
-                print("episode: {}/{}, score: {}"
-                      .format(g, nb_games, reward))
-                break
-
+        #here the Q function gets updated
+        f.write("\n -----------Q Updated----------- ")
         agent.replay(batch_size)
+
+    f.close()
