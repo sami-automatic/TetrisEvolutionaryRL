@@ -1,5 +1,5 @@
-#This is the modified engine so that we can take  multiple actions and train DQN
-#from __future__ import print_function
+# This is the modified engine so that we can take  multiple actions and train DQN
+# from __future__ import print_function
 
 import numpy as np
 import random
@@ -71,18 +71,14 @@ class TetrisEngine:
         self.height = height
         self.board = np.asarray(board, dtype=np.float32) if len(board) > 0 else np.zeros(
             shape=(width, height), dtype=np.float)
-        
-        #make those hard_coded from the best survived hedonistic agent
-        self.column_count = 20
-        self.row_count = 10
-        self.touches_another_block_reward = 182.06908759316752
-        self.touches_floor_reward = 197.80362431053217
-        self.touches_wall_reward = 11.101274843710573
-        self.clear_line_reward = 55.32199495763268
-        self.height_multiplier_penalty = -0.11704552783216822
-        self.hole_penalty = -0.41247700693381895
-        self.blockade_penalty = -0.2123814086602633
-        self.bumpiness_penalty = -0.18858682144007557
+
+
+        # make those hard_coded from the best survived hedonistic agent
+        self.clear_line_reward = 0.76
+        self.height_penalty = -0.510066
+        self.hole_penalty = -0.36
+        self.bumpiness_penalty = -0.18
+        self.game_over_penalty = -0.76
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -92,15 +88,14 @@ class TetrisEngine:
             3: soft_drop,
             4: rotate_left,
             5: rotate_right,
-            6: idle,
+            6: idle#suspect
         }
         self.action_value_map = dict(
             [(j, i) for i, j in self.value_action_map.items()])
-            
+
         self.nb_actions = len(self.actions)
 
         # for running the engine
-        self.time = -1
         self.score = -1
         self.anchor = None
         self.shape = None
@@ -124,13 +119,13 @@ class TetrisEngine:
 
     def _new_piece(self):
         # Place randomly on x-axis with 2 tiles padding
-        #x = int((self.width/2+1) * np.random.rand(1,1)[0,0]) + 2
+        # x = int((self.width/2+1) * np.random.rand(1,1)[0,0]) + 2
 
         # ATTENTION: Normally it's in the middle!
         # self.anchor = (self.width / 2, 0)
         self.anchor = (0, 0)
 
-        #self.anchor = (x, 0)
+        # self.anchor = (x, 0)
         self.shape = self._choose_shape()
 
     def _has_dropped(self):
@@ -171,57 +166,46 @@ class TetrisEngine:
 
     def step(self, actions_code):
         consecutive_actions = self.actions[actions_code]
-        print("consecutive_actions", consecutive_actions)
         cleared = 0
 
         for action in consecutive_actions:
-            board, done, cleared_with_one_action = self.small_step(action)
+            board, cleared_with_one_action, done = self.one_step(action)
             cleared += cleared_with_one_action
-        
+            if done:
+                break
+
         state = np.copy(board)
-        full_reward = self.calculate_score(state,cleared)
-        print("State\n", state)
+        full_reward = self.calculate_score(state, cleared, done)
         return state, full_reward, done, cleared
 
-    def small_step(self, action):
+    def one_step(self, action):
         self.anchor = (int(self.anchor[0]), int(self.anchor[1]))
-        self.shape, self.anchor = self.value_action_map[action](
-            self.shape, self.anchor, self.board)
-        # Drop each step
-        self.shape, self.anchor = soft_drop(
-            self.shape, self.anchor, self.board)
+        self.shape, self.anchor = self.value_action_map[action](self.shape, self.anchor, self.board)
 
-        # Update time and reward
-        self.time += 1
-        ##reward = self.valid_action_count()
-        #reward = 1
-
-        #
-        cleared = 0
+        cleared_lines = 0
         done = False
         if self._has_dropped():
             self._set_piece(True)
-            cleared_lines = self._clear_lines()
-            #reward += 10 * cleared_lines
-            cleared = cleared_lines
-            if np.any(self.board[:, 0]):
-                # self.clear()
+            cleared_lines += self._clear_lines()
+
+            # game over state
+            if np.any(self.board[:, 1]):
+                self.clear()
                 self.n_deaths += 1
                 done = True
-                ##reward = -10
             else:
                 self._new_piece()
 
         self._set_piece(True)
         state = np.copy(self.board)
         self._set_piece(False)
-        return state, done, cleared
+        return state, cleared_lines, done
+
 
     def clear(self):
-        self.time = 0
         self.score = 0
         self._new_piece()
-        self.board = np.zeros_like(self.board)#deniz bunu niye kaldırdın lan
+        self.board = np.zeros_like(self.board)
 
         return self.board
 
@@ -241,87 +225,54 @@ class TetrisEngine:
         self._set_piece(False)
         return s
 
+    def calculate_score(self, board, cleared, done):
+        holes_score = self.calculate_holes(board)
+        bumpiness_score, height_score = self.calculate_bumpiness_and_height(board)
+        if done:
+            game_over_score = 1
+        else:
+            game_over_score = 0
 
-#from hedonistic agent
-    def calculate_score(self, obs, cleared):
-        edge_score = 0.0
-        hole_count = 0
-        blockaded_count = 0
+        return holes_score*self.hole_penalty \
+               + bumpiness_score*self.bumpiness_penalty \
+               + cleared * self.clear_line_reward \
+               + game_over_score*self.game_over_penalty
 
-        for (i, row) in enumerate(obs):
-            for (j, cell) in enumerate(row):
-                # starting position of block. ignore!
-                if self.is_starting_cell(i, j):
-                    continue
-                if cell:
-                    edge_point = self.calculate_edge(obs, i, j)
-                    edge_score += edge_point
-                else:
-                    try:
-                        if obs[i - 1][j]:   # empty and top of blocked
-                            blockaded_count += 1
-                        else:               # top is not blocked, normal hole
-                            hole_count += 1
-                    except IndexError:      # top doesn't exist, normal hole
-                        hole_count += 1
-        total_score, hole_score, bumpiness_score, blockaded_score = (0, 0, 0, 0)
-        cleared_score = self.calculate_cleared_score(cleared)
 
-        if cleared == 0:
-            hole_score = self.calculate_hole_score(hole_count)
-            bumpiness_score = self.calculate_bumpiness_score(obs)
-            blockaded_score = self.calculate_blockaded_score(blockaded_count)
+    def calculate_holes(self, board):
+        holes = 0
+        for col in range(self.width):
+            found_top = False
+            for row in range(1,self.height):
+                if board[col][row] == 1:
+                    found_top = True
+                if found_top & (board[col][row] == 0):
+                    holes += 1
+        return holes
 
-        print("cleared score:", cleared_score)
-        total_score = edge_score + hole_score + \
-            bumpiness_score + blockaded_score + cleared_score
-        total_score = round(total_score, 2)
-        print("total score:", total_score, "\n\n")
-        return total_score
+    def calculate_bumpiness_and_height(self, board):
+        bump = 0
+        heights = []
+        for col in range(self.width):
+            found_top = False
+            height_col = 0
+            for row in range(1, self.height):
+                if board[col][row] == 1:
+                    found_top = True
+                if found_top:
+                    height_col += 1
+            heights.append(height_col)
 
-    def calculate_edge(self, obs, i, j):
-        point = 0.0     # cumulative point of edge
-        # neighbours of cell.
-        neighbours = [(i-1, j), (i, j-1), (i+1, j), (i, j+1)]
-        got_floor_point = False
-        for (x, y) in neighbours:
-            if j == self.column_count - 1 and not got_floor_point:   # touching the floor
-                point += self.touches_floor_reward
-                got_floor_point = True
-            try:                # has neighboring index
-                if obs[x][y]:   # touches another block
-                    point += self.touches_another_block_reward
-            except IndexError:                                  # point is on the edge
-                if y == self.column_count and got_floor_point:  # if we added the floor point, don't add extra 2.5!
-                    continue
-                point += self.touches_wall_reward
-        return point
+        for i in range(len(heights)-1):
+            bump += abs(heights[i] - heights[i+1])
 
-    def calculate_hole_score(self, hole_count):
-        return self.hole_penalty * hole_count
+        h = sum(heights)
+        return bump, h
 
-    def get_highest_index(self, list):
-        index = 0
-        for (i, value) in enumerate(list):
-            if value == 1 and i > index:
-                index = i
-        return index
 
-    def calculate_bumpiness_score(self, obs):
-        penalty = 0.0
-        for i in range(self.row_count - 1):
-            diff = abs(self.get_highest_index(
-                obs[i]) - self.get_highest_index(obs[i + 1]))
-            penalty += diff * self.bumpiness_penalty
-        return penalty
 
-    def is_starting_cell(self, i, j):
-        # (i == mid or i == (mid - 1))
-        return j == 0 and i == 0
 
-    def calculate_blockaded_score(self, blockaded_count):
-        return self.blockade_penalty * blockaded_count
 
-    def calculate_cleared_score(self, cleared):
-        return self.clear_line_reward * cleared
+
+
 
