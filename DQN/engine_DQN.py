@@ -74,11 +74,11 @@ class TetrisEngine:
 
 
         # make those hard_coded from the best survived hedonistic agent
-        self.clear_line_reward = 0.76
-        self.height_penalty = -0.510066
+        self.clear_line_reward = 15.0
+        self.height_penalty = -0.810066
         self.hole_penalty = -0.36
         self.bumpiness_penalty = -0.18
-        self.game_over_penalty = -0.76
+        self.game_over_penalty = -0.86
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -155,13 +155,7 @@ class TetrisEngine:
         return valid_action_sum
 
     actions = [
-        [2], [1, 2], [1, 1, 2], [1, 1, 1, 2], [1, 1, 1, 1, 2],
-        [4, 2], [4, 1, 2], [4, 1, 1, 2], [4, 1, 1, 1, 2], [4, 1, 1, 1, 1, 2],
-        [4, 4, 2], [4, 4, 1, 2], [4, 4, 1, 1, 2], [4, 4, 1, 1, 1, 2], [4, 4, 1, 1, 1, 1, 2],
-        [4, 4, 4, 2], [4, 4, 4, 1, 2], [4, 4, 4, 1, 1, 2], [4, 4, 4, 1, 1, 1, 2], [4, 4, 4, 1, 1, 1, 1, 2],
-        [5, 2], [5, 1, 2], [5, 1, 1, 2], [5, 1, 1, 1, 2], [5, 1, 1, 1, 1, 2],
-        [5, 5, 2], [5, 5, 1, 2], [5, 5, 1, 1, 2], [5, 5, 1, 1, 1, 2], [5, 5, 1, 1, 1, 1, 2],
-        [5, 5, 5, 2], [5, 5, 5, 1, 2], [5, 5, 5, 1, 1, 2], [5, 5, 5, 1, 1, 1, 2], [5, 5, 5, 1, 1, 1, 1, 2],
+        [1, 2], [1, 1, 2], [1, 1, 1, 2], [5, 2], [5, 1, 2], [5, 1, 1, 2], [5, 1, 1, 1, 2]
     ]
 
     def step(self, actions_code):

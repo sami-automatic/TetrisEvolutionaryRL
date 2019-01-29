@@ -12,7 +12,7 @@ def init():
     # Enumerate keys
     stdscr.keypad(True)
 
-width, height = 6, 10
+width, height = 5, 9
 env = TetrisEngine(width, height)
 done = False
 
@@ -21,7 +21,7 @@ while True:
         action_code = input("action code : ")
         state, reward, done, cleared = env.step(int(action_code))
         print(str(reward))
-        print(str(state))
+        print(state)
 
     print("GAME_OVER")
     done = False
