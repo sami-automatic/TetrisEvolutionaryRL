@@ -66,19 +66,19 @@ def idle(shape, anchor, board):
 
 
 class TetrisEngine:
-    def __init__(self, width, height, board=[]):
+    def __init__(self, width, height, board=[], parameters):
+        for k, v in parameters.items():
+            setattr(self, k, v)
         self.width = width
         self.height = height
         self.board = np.asarray(board, dtype=np.float32) if len(board) > 0 else np.zeros(
             shape=(width, height), dtype=np.float)
-
-
         # make those hard_coded from the best survived hedonistic agent
-        self.clear_line_reward = 15.0
-        self.height_penalty = -0.810066
-        self.hole_penalty = -0.36
-        self.bumpiness_penalty = -0.18
-        self.game_over_penalty = -0.86
+        # self.clear_line_reward = 15.0
+        # self.height_penalty = -0.810066
+        # self.hole_penalty = -0.36
+        # self.bumpiness_penalty = -0.18
+        # self.game_over_penalty = -0.86
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -262,11 +262,3 @@ class TetrisEngine:
 
         h = sum(heights)
         return bump, h
-
-
-
-
-
-
-
-

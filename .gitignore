@@ -105,3 +105,18 @@ venv.bak/
 
 # vscode
 .vscode/
+
+# idea IDM
+.idea/
+
+# VIM artifacts
+*.swp
+*.swo
+
+# output
+*/*.txt
+*.txt
+
+# model
+*/*.h5
+*.h5
