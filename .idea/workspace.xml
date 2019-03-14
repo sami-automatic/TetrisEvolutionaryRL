@@ -4,8 +4,7 @@
     <list default="true" id="27e8195f-ca17-4be6-a8c7-a1a2a3f944df" name="Default Changelist" comment="DQN changed: now the same cached Q function is being used for several iterations then gets updated for stability">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DQN/dqnkeras.py" beforeDir="false" afterPath="$PROJECT_DIR$/DQN/dqnkeras.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN/engine_DQN.py" beforeDir="false" afterPath="$PROJECT_DIR$/DQN/engine_DQN.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN/gui_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/DQN/gui_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/engine.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,64 +16,54 @@
     <session id="-904982084">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="7" />
+          <entry key="project.closed" value="11" />
           <entry key="project.open.time.0" value="2" />
-          <entry key="project.open.time.3" value="2" />
-          <entry key="project.open.time.4" value="7" />
-          <entry key="project.open.time.5" value="2" />
-          <entry key="project.opened" value="13" />
+          <entry key="project.open.time.3" value="4" />
+          <entry key="project.open.time.4" value="11" />
+          <entry key="project.open.time.5" value="4" />
+          <entry key="project.open.time.6" value="1" />
+          <entry key="project.opened" value="22" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="md" value="1" />
-          <entry key="py" value="32" />
+          <entry key="py" value="34" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="1" />
-          <entry key="Python" value="32" />
+          <entry key="Python" value="34" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="1" />
-          <entry key="py" value="4552" />
+          <entry key="py" value="5718" />
           <entry key="txt" value="182" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="183" />
-          <entry key="Python" value="4552" />
+          <entry key="Python" value="5718" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5244755">
+    <splitter split-orientation="horizontal" split-proportion="0.44339624">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/DQN/dqnkeras.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1080">
-                  <caret line="75" column="40" lean-forward="true" selection-start-line="75" selection-start-column="40" selection-end-line="75" selection-end-column="40" />
+                <state relative-caret-position="684">
+                  <caret line="113" lean-forward="true" selection-start-line="113" selection-end-line="113" />
                   <folding>
                     <element signature="e#13#31#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/DQN/gui_engine.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="80">
-                  <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-                  <folding>
-                    <element signature="e#0#13#0" expanded="true" />
+                    <marker date="1552461357531" expanded="true" signature="807:877" ph="..." />
                   </folding>
                 </state>
               </provider>
@@ -87,9 +76,19 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Genetic/hedonistic_agent.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
+                <state relative-caret-position="-3440">
+                  <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/DQN/testbed_dqn.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="540">
+                  <caret line="27" column="54" selection-start-line="27" selection-start-column="54" selection-end-line="27" selection-end-column="54" />
                   <folding>
-                    <element signature="e#0#31#0" expanded="true" />
+                    <element signature="e#0#35#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -98,21 +97,12 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/DQN/engine_DQN.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1320">
-                  <caret line="84" column="9" selection-start-line="84" selection-start-column="9" selection-end-line="84" selection-end-column="9" />
+                <state relative-caret-position="-1300">
+                  <caret line="1" column="30" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="30" />
                   <folding>
                     <element signature="e#123#141#0" expanded="true" />
                     <marker date="1548709486782" expanded="true" signature="5867:5874" ph="..." />
                   </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/engine.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3120">
-                  <caret line="157" column="8" selection-start-line="157" selection-start-column="8" selection-end-line="157" selection-end-column="8" />
                 </state>
               </provider>
             </entry>
@@ -145,12 +135,16 @@
       <find>nb_acti</find>
       <find>action</find>
       <find>6.</find>
-      <find>6.</find>
       <find>7.</find>
       <find>8.</find>
       <find>9.</find>
       <find>Reward: 1</find>
       <find>Re</find>
+      <find>model</find>
+      <find>20</find>
+      <find>batch</find>
+      <find>epsilon_de</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -163,25 +157,27 @@
         <option value="$PROJECT_DIR$/dqnkeras.py" />
         <option value="$PROJECT_DIR$/gui_engine.py" />
         <option value="$PROJECT_DIR$/player_engine.py" />
-        <option value="$PROJECT_DIR$/engine.py" />
         <option value="$PROJECT_DIR$/user_engine.py" />
         <option value="$PROJECT_DIR$/Genetic/user_engine.py" />
-        <option value="$PROJECT_DIR$/DQN/gui_engine.py" />
         <option value="$PROJECT_DIR$/DQN/engine_DQN.py" />
+        <option value="$PROJECT_DIR$/engine.py" />
+        <option value="$PROJECT_DIR$/DQN/gui_engine.py" />
         <option value="$PROJECT_DIR$/DQN/dqnkeras.py" />
+        <option value="$PROJECT_DIR$/DQN/testbed_dqn.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="29" />
-    <option name="width" value="960" />
-    <option name="height" value="1051" />
+    <option name="width" value="940" />
+    <option name="height" value="788" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -196,22 +192,16 @@
             </path>
             <path>
               <item name="TetrisEvolutionaryRL" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TetrisEvolutionaryRL" type="462c0819:PsiDirectoryNode" />
-              <item name="Genetic" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TetrisEvolutionaryRL" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/h1_edited" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -226,7 +216,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.gui_engine (1)">
+  <component name="RunManager" selected="Python.testbed_dqn">
     <configuration name="dqnkeras (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TetrisEvolutionaryRL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -290,7 +280,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="player_engine" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="testbed_dqn" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TetrisEvolutionaryRL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -298,11 +288,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/DQN" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/player_engine.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DQN/testbed_dqn.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -333,19 +323,19 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.player_engine" />
       <item itemvalue="Python.user_engine" />
       <item itemvalue="Python.gui_engine (1)" />
       <item itemvalue="Python.dqnkeras (1)" />
       <item itemvalue="Python.engine_DQN" />
+      <item itemvalue="Python.testbed_dqn" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.gui_engine (1)" />
+        <item itemvalue="Python.testbed_dqn" />
         <item itemvalue="Python.dqnkeras (1)" />
+        <item itemvalue="Python.gui_engine (1)" />
         <item itemvalue="Python.engine_DQN" />
         <item itemvalue="Python.user_engine" />
-        <item itemvalue="Python.player_engine" />
       </list>
     </recent_temporary>
   </component>
@@ -371,16 +361,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="29" width="1920" height="1051" extended-state="6" />
+    <frame x="0" y="29" width="1920" height="1051" extended-state="7" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17123288" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09905163" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.0" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.41118422" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.09210526" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.125" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -448,26 +438,44 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Genetic/user_engine.py" />
-    <entry file="file://$PROJECT_DIR$/Genetic/hedonistic_agent.py">
+    <entry file="file://$PROJECT_DIR$/engine.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="-1069">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DQN/gui_engine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/engine.py">
+    <entry file="file://$PROJECT_DIR$/Genetic/hedonistic_agent.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3120">
-          <caret line="157" column="8" selection-start-line="157" selection-start-column="8" selection-end-line="157" selection-end-column="8" />
+        <state relative-caret-position="-3440">
+          <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DQN/testbed_dqn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="27" column="54" selection-start-line="27" selection-start-column="54" selection-end-line="27" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DQN/engine_DQN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1320">
-          <caret line="84" column="9" selection-start-line="84" selection-start-column="9" selection-end-line="84" selection-end-column="9" />
+        <state relative-caret-position="-1300">
+          <caret line="1" column="30" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="30" />
           <folding>
             <element signature="e#123#141#0" expanded="true" />
             <marker date="1548709486782" expanded="true" signature="5867:5874" ph="..." />
@@ -477,20 +485,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DQN/dqnkeras.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1080">
-          <caret line="75" column="40" lean-forward="true" selection-start-line="75" selection-start-column="40" selection-end-line="75" selection-end-column="40" />
+        <state relative-caret-position="684">
+          <caret line="113" lean-forward="true" selection-start-line="113" selection-end-line="113" />
           <folding>
             <element signature="e#13#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DQN/gui_engine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <marker date="1552461357531" expanded="true" signature="807:877" ph="..." />
           </folding>
         </state>
       </provider>

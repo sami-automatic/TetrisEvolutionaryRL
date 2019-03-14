@@ -1,12 +1,14 @@
-#manuel DQN
+# manuel DQN
 
 import numpy as np
 from keras.layers import Dense
 from keras.models import Sequential
 from keras.optimizers import Adam
 from keras.callbacks import deque
+from keras.models import load_model
 import random
 from engine_DQN import TetrisEngine
+
 
 class DQNAgent:
 
@@ -14,18 +16,23 @@ class DQNAgent:
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=20000)
-        self.gamma = 0.75    # discount rate
+        self.gamma = 0.9  # discount rate
         self.epsilon = 1.0  # exploration rate
-        self.epsilon_min = 0.1
-        self.epsilon_decay = 0.995
-        self.learning_rate = 0.0005
+        self.epsilon_min = 0.01
+        self.epsilon_decay = 0.99995#0.9995
+        self.learning_rate = 0.0001#0.0001
         self.model = self._build_model()
+        self.target_model = self._build_model()
+        self.update_target_model()
+
+    def update_target_model(self):
+        self.target_model.set_weights(self.model.get_weights())
 
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
         model = Sequential()
-        model.add(Dense(16, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(16, activation='relu'))
+        model.add(Dense(128, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(128, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
@@ -42,120 +49,65 @@ class DQNAgent:
         return np.argmax(act_values[0])  # returns action
 
     def replay(self, batch_size):
-        #to try with iterative memory and random sampling
+        # to try with iterative memory and random sampling
         minibatch = random.sample(self.memory, batch_size)
-
+        general_state = []
+        general_target = []
         for state, action, reward, next_state, done in minibatch:
             target = reward
             if not done:
-              target = reward + self.gamma * \
-                       np.amax(self.model.predict(next_state)[0])
-            target_f = self.model.predict(state)
+                target = reward + self.gamma * \
+                         np.amax(self.model.predict(next_state)[0])
+            target_f = self.target_model.predict(state)
             target_f[0][action] = target
-            self.model.fit(state, target_f, epochs=1, verbose=0)
+            general_state.append(state)
+            general_target.append(target_f)
+
+        general_state = np.reshape(general_state, (-1, 45))
+        general_target = np.reshape(general_target, (-1, 7))
+        self.model.fit(general_state, general_target, epochs=1, verbose=0)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
-#Training of our DQN
+
+# Training of our DQN
 
 if __name__ == "__main__":
+
     # initialize gym environment and the agent
-    nb_updates = 9000
-    batch_size = 250
-    nb_games = 250 # to play without changing cached Q function
+    batch_size = 64#64
+    nb_games = 10000
     env = TetrisEngine(5, 9)
-    state_size = env.height*env.width
+    state_size = env.height * env.width
     action_size = len(env.actions)
     agent = DQNAgent(state_size, action_size)
-    #f = open("test", "w+")
 
-
-    #training with given
-    state = env.clear()
-    good_combo_1 = [3,5,6,3,4,6,0,2,3,4]
-    good_combo_2 = [3,2,4,6]
-
-    for _ in range(100):
-        for act in good_combo_1:
-            state_shaped = np.reshape(state, [1, 45])
-            next_state, reward, done, _ = env.step(act)
-            next_state_shaped = np.reshape(next_state, [1, 45])
-            agent.remember(state_shaped, act, reward, next_state_shaped, done)
-            state = next_state
-
+    for g in range(nb_games):
         state = env.clear()
-        for act in good_combo_2:
+        done = False
+        cumulative_reward = 0
+        n_actions_taken = 0
+
+        while not done:
+            n_actions_taken += 1
+
+            # Decide action
             state_shaped = np.reshape(state, [1, 45])
-            next_state, reward, done, _ = env.step(act)
+            action = agent.act(state_shaped)
+
+            next_state, reward, done, _ = env.step(action)
             next_state_shaped = np.reshape(next_state, [1, 45])
-            agent.remember(state_shaped, act, reward, next_state_shaped, done)
+            cumulative_reward += reward
+
+            agent.remember(state_shaped, action, reward, next_state_shaped, done)
             state = next_state
 
-    agent.replay(len(agent.memory))
+            if len(agent.memory) > batch_size:
+                agent.replay(batch_size)
 
-    for u in range(nb_updates):
-        #the DQN is iterated with the same Q function nb_games times
-        for g in range(nb_games):
-            state = env.clear()
-            done = False
-            print("New Game")
-            #play one tetris game until game over
-            while not done:
-                # Decide action
-                state_shaped = np.reshape(state, [1, 45])
-                action = agent.act(state_shaped)
-                print(TetrisEngine.actions[action])
-                next_state, reward, done, _ = env.step(action)
-                next_state_shaped = np.reshape(next_state, [1, 45])
-
-                agent.remember(state_shaped, action, reward, next_state_shaped, done)
-                state = next_state
-                print(state,"\n Reward:", reward)
-            print("GAME_OVER")
-            #f.write("\n updates: ", u, "/", nb_updates," games: ", g, "/", nb_games," reward: ", reward)
-
-        #here the Q function gets updated
-        #f.write("\n -----------Q Updated----------- ")
-        agent.replay(batch_size)
-
-    print("Here how I PLAY")
-    state = env.clear
-    done = False
-    while not done:
-        # Decide action
-        state_shaped = np.reshape(state, [1, 45])
-        action = agent.act(state_shaped)
-        print(TetrisEngine.actions[action])
-        next_state, reward, done, _ = env.step(action)
-        state = next_state
-        print(state, "\n Reward:", reward)
-    print("GAME_OVER")
-
-    print("How I PLAY IN SCENARIO")
-    '''
-    [[1. 0. 0. 0. 1. 1. 1. 1. 0.]
-     [0. 0. 0. 0. 0. 1. 1. 1. 1.]
-     [0. 0. 0. 0. 1. 1. 1. 1. 0.]
-     [0. 0. 0. 0. 0. 1. 1. 1. 1.]
-     [0. 0. 0. 0. 0. 0. 0. 0. 0.]]
-    '''
-    combo =[3,3,5,5]
-    state = env.clear()
-
-    for act in combo:
-        next_state, reward, done, _ = env.step(act)
-        state = next_state
-    print(state)
-    while not done:
-        # Decide action
-        state_shaped = np.reshape(state, [1, 45])
-        action = agent.act(state_shaped)
-        print(TetrisEngine.actions[action])
-        next_state, reward, done, _ = env.step(action)
-        state = next_state
-        print(state, "\n Reward:", reward)
-    print("GAME_OVER")
-
-
-    #f.close()
+        agent.update_target_model()
+        print("cumulative reward:\t", '{:.3}'.format(cumulative_reward),\
+              "\t epsilon:\t",  '{:.6}'.format(agent.epsilon),\
+              "\t episode:\t", g, "number_actions:\t", n_actions_taken)
+        agent.model.save('model3.h5')
