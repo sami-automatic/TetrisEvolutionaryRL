@@ -19,8 +19,8 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.99995#0.9995
-        self.learning_rate = 0.0001#0.0001
+        self.epsilon_decay = 0.99995  # 0.9995
+        self.learning_rate = 0.0001  # 0.0001
         self.model = self._build_model()
         self.target_model = self._build_model()
         self.update_target_model()
@@ -57,7 +57,7 @@ class DQNAgent:
             target = reward
             if not done:
                 target = reward + self.gamma * \
-                         np.amax(self.model.predict(next_state)[0])
+                    np.amax(self.model.predict(next_state)[0])
             target_f = self.target_model.predict(state)
             target_f[0][action] = target
             general_state.append(state)
@@ -76,7 +76,7 @@ class DQNAgent:
 if __name__ == "__main__":
 
     # initialize gym environment and the agent
-    batch_size = 64#64
+    batch_size = 64  # 64
     nb_games = 10000
     env = TetrisEngine(5, 9)
     state_size = env.height * env.width
@@ -100,14 +100,15 @@ if __name__ == "__main__":
             next_state_shaped = np.reshape(next_state, [1, 45])
             cumulative_reward += reward
 
-            agent.remember(state_shaped, action, reward, next_state_shaped, done)
+            agent.remember(state_shaped, action, reward,
+                           next_state_shaped, done)
             state = next_state
 
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
         agent.update_target_model()
-        print("cumulative reward:\t", '{:.3}'.format(cumulative_reward),\
-              "\t epsilon:\t",  '{:.6}'.format(agent.epsilon),\
+        print("cumulative reward:\t", '{:.3}'.format(cumulative_reward),
+              "\t epsilon:\t",  '{:.6}'.format(agent.epsilon),
               "\t episode:\t", g, "number_actions:\t", n_actions_taken)
         agent.model.save('model3.h5')

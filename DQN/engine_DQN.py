@@ -66,19 +66,16 @@ def idle(shape, anchor, board):
 
 
 class TetrisEngine:
-    def __init__(self, width, height, board=[], parameters):
-        for k, v in parameters.items():
-            setattr(self, k, v)
+    def __init__(self, width, height, board=[], genes=[15.0, -0.810066, -0.36, -0.18, -0.86]):
         self.width = width
         self.height = height
         self.board = np.asarray(board, dtype=np.float32) if len(board) > 0 else np.zeros(
             shape=(width, height), dtype=np.float)
-        # make those hard_coded from the best survived hedonistic agent
-        # self.clear_line_reward = 15.0
-        # self.height_penalty = -0.810066
-        # self.hole_penalty = -0.36
-        # self.bumpiness_penalty = -0.18
-        # self.game_over_penalty = -0.86
+        self.clear_line_reward = genes[0]
+        self.height_penalty = genes[1]
+        self.hole_penalty = genes[2]
+        self.bumpiness_penalty = genes[3]
+        self.game_over_penalty = genes[4]
 
         # actions are triggered by letters
         self.value_action_map = {
@@ -88,7 +85,7 @@ class TetrisEngine:
             3: soft_drop,
             4: rotate_left,
             5: rotate_right,
-            6: idle#suspect
+            6: idle  # suspect
         }
         self.action_value_map = dict(
             [(j, i) for i, j in self.value_action_map.items()])
@@ -106,6 +103,22 @@ class TetrisEngine:
 
         # clear after initializing
         self.clear()
+
+    def get_genes(self):
+        return [
+            self.clear_line_reward,
+            self.height_penalty,
+            self.hole_penalty,
+            self.bumpiness_penalty,
+            self.game_over_penalty
+        ]
+
+    def set_genes(self, genes):
+        self.clear_line_reward = genes[0]
+        self.height_penalty = genes[1]
+        self.hole_penalty = genes[2]
+        self.bumpiness_penalty = genes[3]
+        self.game_over_penalty = genes[4]
 
     def _choose_shape(self):
         maxm = max(self._shape_counts)
@@ -155,7 +168,8 @@ class TetrisEngine:
         return valid_action_sum
 
     actions = [
-        [1, 2], [1, 1, 2], [1, 1, 1, 2], [5, 2], [5, 1, 2], [5, 1, 1, 2], [5, 1, 1, 1, 2]
+        [1, 2], [1, 1, 2], [1, 1, 1, 2], [5, 2], [
+            5, 1, 2], [5, 1, 1, 2], [5, 1, 1, 1, 2]
     ]
 
     def step(self, actions_code):
@@ -174,7 +188,8 @@ class TetrisEngine:
 
     def one_step(self, action):
         self.anchor = (int(self.anchor[0]), int(self.anchor[1]))
-        self.shape, self.anchor = self.value_action_map[action](self.shape, self.anchor, self.board)
+        self.shape, self.anchor = self.value_action_map[action](
+            self.shape, self.anchor, self.board)
 
         cleared_lines = 0
         done = False
@@ -194,7 +209,6 @@ class TetrisEngine:
         state = np.copy(self.board)
         self._set_piece(False)
         return state, cleared_lines, done
-
 
     def clear(self):
         self.score = 0
@@ -221,23 +235,23 @@ class TetrisEngine:
 
     def calculate_score(self, board, cleared, done):
         holes_score = self.calculate_holes(board)
-        bumpiness_score, height_score = self.calculate_bumpiness_and_height(board)
+        bumpiness_score, height_score = self.calculate_bumpiness_and_height(
+            board)
         if done:
             game_over_score = 1
         else:
             game_over_score = 0
 
-        return holes_score*self.hole_penalty \
-               + bumpiness_score*self.bumpiness_penalty \
-               + cleared * self.clear_line_reward \
-               + game_over_score*self.game_over_penalty
-
+        return holes_score * self.hole_penalty \
+            + bumpiness_score * self.bumpiness_penalty \
+            + cleared * self.clear_line_reward \
+            + game_over_score * self.game_over_penalty
 
     def calculate_holes(self, board):
         holes = 0
         for col in range(self.width):
             found_top = False
-            for row in range(1,self.height):
+            for row in range(1, self.height):
                 if board[col][row] == 1:
                     found_top = True
                 if found_top & (board[col][row] == 0):
@@ -257,8 +271,8 @@ class TetrisEngine:
                     height_col += 1
             heights.append(height_col)
 
-        for i in range(len(heights)-1):
-            bump += abs(heights[i] - heights[i+1])
+        for i in range(len(heights) - 1):
+            bump += abs(heights[i] - heights[i + 1])
 
         h = sum(heights)
         return bump, h
