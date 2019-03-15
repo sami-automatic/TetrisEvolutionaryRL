@@ -1,5 +1,3 @@
-# manuel DQN
-
 import numpy as np
 from keras.layers import Dense
 from keras.models import Sequential
@@ -8,6 +6,7 @@ from keras.callbacks import deque
 from keras.models import load_model
 import random
 from engine_DQN import TetrisEngine
+from functools import reduce
 
 
 class DQNAgent:
@@ -71,44 +70,58 @@ class DQNAgent:
             self.epsilon *= self.epsilon_decay
 
 
-# Training of our DQN
+class Trainer:
+    def __init__(self, env, nb_games = 10000):
+        self.env = env
+        self.nb_games = nb_games
 
-if __name__ == "__main__":
+    def train(self):
+        print("Playing with", self.env)
+        # initialize gym environment and the agent
+        batch_size = 64
+        state_size = self.env.height * self.env.width
+        action_size = len(self.env.actions)
+        agent = DQNAgent(state_size, action_size)
+        rewards = []
+        for g in range(self.nb_games):
+            state = self.env.clear()
+            done = False
+            cumulative_reward = 0
+            n_actions_taken = 0
 
-    # initialize gym environment and the agent
-    batch_size = 64  # 64
-    nb_games = 10000
-    env = TetrisEngine(5, 9)
-    state_size = env.height * env.width
-    action_size = len(env.actions)
-    agent = DQNAgent(state_size, action_size)
+            while not done:
+                n_actions_taken += 1
+                # Decide action
+                state_shaped = np.reshape(state, [1, 45])
+                action = agent.act(state_shaped)
 
-    for g in range(nb_games):
-        state = env.clear()
-        done = False
-        cumulative_reward = 0
-        n_actions_taken = 0
+                next_state, reward, done, _ = self.env.step(action)
+                next_state_shaped = np.reshape(next_state, [1, 45])
+                cumulative_reward += reward
 
-        while not done:
-            n_actions_taken += 1
+                agent.remember(state_shaped, action, reward,
+                               next_state_shaped, done)
+                state = next_state
 
-            # Decide action
-            state_shaped = np.reshape(state, [1, 45])
-            action = agent.act(state_shaped)
+                if len(agent.memory) > batch_size:
+                    agent.replay(batch_size)
 
-            next_state, reward, done, _ = env.step(action)
-            next_state_shaped = np.reshape(next_state, [1, 45])
-            cumulative_reward += reward
+            agent.update_target_model()
+            rewards.append(cumulative_reward)
+            print("cumulative reward: ", '{:.3}'.format(cumulative_reward),
+                  "\tepsilon: ",  '{:.6}'.format(agent.epsilon),
+                  "\tepisode: ", g,
+                  "\tnumber_actions: ", n_actions_taken)
+            model_name = "model_%s.h5" % (env)
+            agent.model.save(model_name)
+        rewards.sort()
+        top_10 = rewards[10:]
+        print("top_10\n", top_10)
+        avarage = reduce(lambda x, y: x + y, top_10) / 10
+        print("avarage", avarage)
+        return avarage
 
-            agent.remember(state_shaped, action, reward,
-                           next_state_shaped, done)
-            state = next_state
-
-            if len(agent.memory) > batch_size:
-                agent.replay(batch_size)
-
-        agent.update_target_model()
-        print("cumulative reward:\t", '{:.3}'.format(cumulative_reward),
-              "\t epsilon:\t",  '{:.6}'.format(agent.epsilon),
-              "\t episode:\t", g, "number_actions:\t", n_actions_taken)
-        agent.model.save('model3.h5')
+# same as old __main__
+env = TetrisEngine(5, 9)
+trainer = Trainer(env, 150)
+trainer.train()
