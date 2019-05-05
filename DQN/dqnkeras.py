@@ -18,7 +18,7 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.99995  # 0.9995
+        self.epsilon_decay = 0.9995  # 0.9995
         self.learning_rate = 0.0001  # 0.0001
         self.model = self._build_model()
         self.target_model = self._build_model()
@@ -83,6 +83,7 @@ class Trainer:
         action_size = len(self.env.actions)
         agent = DQNAgent(state_size, action_size)
         rewards = []
+
         for g in range(self.nb_games):
             state = self.env.clear()
             done = False
@@ -114,14 +115,36 @@ class Trainer:
                   "\tnumber_actions: ", n_actions_taken)
             model_name = "model_%s.h5" % (env)
             agent.model.save(model_name)
-        rewards.sort()
-        top_10 = rewards[10:]
-        print("top_10\n", top_10)
-        avarage = reduce(lambda x, y: x + y, top_10) / 10
-        print("avarage", avarage)
-        return avarage
+
+        return self.get_survived_steps(model_name)
+
+    def get_survived_steps(self, model_name):
+        model = load_model(model_name)
+        env = TetrisEngine(5, 9)
+        state = env.clear()
+        done = False
+        cumulative_reward = 0
+        n_actions_taken = 0
+        while not done:
+            n_actions_taken += 1
+            state_shaped = np.reshape(state, [1, 45])
+            action_vals = model.predict(state_shaped)
+            action = np.argmax(action_vals[0])
+            next_state, reward, done, _ = env.step(action)
+            next_state_shaped = np.reshape(next_state, [1, 45])
+            cumulative_reward += reward
+            state = next_state
+        return n_actions_taken
+
 
 # same as old __main__
 env = TetrisEngine(5, 9)
-trainer = Trainer(env, 150)
-trainer.train()
+trainer = Trainer(env, 1000)
+steps = trainer.train()
+
+env2 = TetrisEngine(5,9,_,[15.0, -5.0, -0.5, -0.9, -5.0])
+trainer2 = Trainer(env2, 1000)
+steps2 = trainer2.train()
+
+print(steps)
+print(steps2)
