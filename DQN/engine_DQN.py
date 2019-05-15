@@ -66,7 +66,7 @@ def idle(shape, anchor, board):
 
 
 class TetrisEngine:
-    def __init__(self, width, height, board=[], genes=[15.0, -0.810066, -0.36, -0.18, -0.86]):
+    def __init__(self, width, height, genes=[15.0, -0.810066, -0.36, -0.18, -0.86], board=[]):
         print("TetrisEngine genes", genes)
         self.width = width
         self.height = height

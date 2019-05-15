@@ -5,6 +5,8 @@ from keras.optimizers import Adam
 from keras.callbacks import deque
 from keras.models import load_model
 import random
+import time
+import matplotlib.pyplot as plt
 from engine_DQN import TetrisEngine
 from functools import reduce
 
@@ -18,8 +20,8 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.9995  # 0.9995
-        self.learning_rate = 0.0001  # 0.0001
+        self.epsilon_decay = 0.999  # 0.9995
+        self.learning_rate = 0.001  # 0.0001
         self.model = self._build_model()
         self.target_model = self._build_model()
         self.update_target_model()
@@ -30,8 +32,8 @@ class DQNAgent:
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
         model = Sequential()
-        model.add(Dense(128, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(128, activation='relu'))
+        model.add(Dense(64, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(64, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
@@ -76,6 +78,10 @@ class Trainer:
         self.nb_games = nb_games
 
     def train(self):
+        fig = plt.figure()
+        fig.show()
+        ax = fig.add_subplot(111)
+
         print("Playing with", self.env)
         # initialize gym environment and the agent
         batch_size = 64
@@ -85,6 +91,9 @@ class Trainer:
         rewards = []
 
         for g in range(self.nb_games):
+            x = []
+            y = []
+            x.append(g)
             state = self.env.clear()
             done = False
             cumulative_reward = 0
@@ -109,12 +118,20 @@ class Trainer:
 
             agent.update_target_model()
             rewards.append(cumulative_reward)
+            y.append(n_actions_taken)
+
+            ax.plot(x, y, color='b')
+
+            fig.canvas.draw()
+            time.sleep(0.1)
             print("cumulative reward: ", '{:.3}'.format(cumulative_reward),
                   "\tepsilon: ",  '{:.6}'.format(agent.epsilon),
                   "\tepisode: ", g,
                   "\tnumber_actions: ", n_actions_taken)
+
             model_name = "model_%s.h5" % (env)
             agent.model.save(model_name)
+        plt.show()
 
         return self.get_survived_steps(model_name)
 
@@ -138,13 +155,20 @@ class Trainer:
 
 
 # same as old __main__
-env = TetrisEngine(5, 9)
-trainer = Trainer(env, 1000)
-steps = trainer.train()
 
-env2 = TetrisEngine(5,9,_,[15.0, -5.0, -0.5, -0.9, -5.0])
-trainer2 = Trainer(env2, 1000)
-steps2 = trainer2.train()
+env = TetrisEngine(5, 9, [5.0, -0.05, -0.3, -0.1, -0.86])
+#env2 = TetrisEngine(5, 9, [3.0, -0.05, -0.3, -0.1, -0.5])
+
+trainer = Trainer(env, 400)
+#trainer2 = Trainer(env2,400)
+
+start = time.time()
+steps = trainer.train()
+#steps2 = trainer2.train()
+end = time.time()
 
 print(steps)
-print(steps2)
+#print(steps2)
+print(end-start)
+
+
