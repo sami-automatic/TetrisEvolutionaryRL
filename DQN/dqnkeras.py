@@ -90,9 +90,9 @@ class Trainer:
         agent = DQNAgent(state_size, action_size)
         rewards = []
 
+        x = []
+        y = []
         for g in range(self.nb_games):
-            x = []
-            y = []
             x.append(g)
             state = self.env.clear()
             done = False
@@ -121,7 +121,6 @@ class Trainer:
             y.append(n_actions_taken)
 
             ax.plot(x, y, color='b')
-
             fig.canvas.draw()
             time.sleep(0.1)
             print("cumulative reward: ", '{:.3}'.format(cumulative_reward),
@@ -129,10 +128,9 @@ class Trainer:
                   "\tepisode: ", g,
                   "\tnumber_actions: ", n_actions_taken)
 
-            model_name = "model_%s.h5" % (env)
+            model_name = "model_%s.h5" % (self.env)
             agent.model.save(model_name)
         plt.show()
-
         return self.get_survived_steps(model_name)
 
     def get_survived_steps(self, model_name):
@@ -156,19 +154,22 @@ class Trainer:
 
 # same as old __main__
 
-env = TetrisEngine(5, 9, [5.0, -0.05, -0.3, -0.1, -0.86])
-#env2 = TetrisEngine(5, 9, [3.0, -0.05, -0.3, -0.1, -0.5])
+# env = TetrisEngine(5, 9, [5.0, -0.05, -0.3, -0.1, -0.86])
+env = TetrisEngine(5, 9, [3.0, -0.25, -0.63, -0.31, -0.65])
+env1 = TetrisEngine(5, 9, [5.0, -0.35, -0.73, -0.51, -0.15])
+# env2 = TetrisEngine(5, 9, [16.0, -0.45, -0.23, -0.17, -0.25])
 
-trainer = Trainer(env, 400)
-#trainer2 = Trainer(env2,400)
+trainer = Trainer(env, 5)
+trainer2 = Trainer(env1, 5)
+# trainer3 = Trainer(env2, 400)
 
 start = time.time()
 steps = trainer.train()
-#steps2 = trainer2.train()
+steps2 = trainer2.train()
+# steps3 = trainer3.train()
 end = time.time()
 
 print(steps)
-#print(steps2)
-print(end-start)
-
-
+print(steps2)
+# print(steps3)
+print(end - start)
