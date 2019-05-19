@@ -21,7 +21,7 @@ class DQNAgent:
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.999  # 0.9995
-        self.learning_rate = 0.001  # 0.0001
+        self.learning_rate = 0.003  # 0.0001
         self.model = self._build_model()
         self.target_model = self._build_model()
         self.update_target_model()
@@ -130,7 +130,9 @@ class Trainer:
 
             model_name = "model_%s.h5" % (self.env)
             agent.model.save(model_name)
-        plt.show()
+        plt.show(block = False)
+        plt.savefig('model_%s.png' % (self.env))
+        plt.close('all')
         return self.get_survived_steps(model_name)
 
     def get_survived_steps(self, model_name):
@@ -152,24 +154,55 @@ class Trainer:
         return n_actions_taken
 
 
-# same as old __main__
+# checking importance of clear line reward
+#clear_line // height // hole // bumpiness // game_over
 
-# env = TetrisEngine(5, 9, [5.0, -0.05, -0.3, -0.1, -0.86])
-env = TetrisEngine(5, 9, [3.0, -0.25, -0.63, -0.31, -0.65])
-env1 = TetrisEngine(5, 9, [5.0, -0.35, -0.73, -0.51, -0.15])
-# env2 = TetrisEngine(5, 9, [16.0, -0.45, -0.23, -0.17, -0.25])
+env  = TetrisEngine(5, 9, [3.0, -0.25, -0.23, -0.31, -0.65])
+env1 = TetrisEngine(5, 9, [5.0, -0.25, -0.23, -0.31, -0.65])
+env2 = TetrisEngine(5, 9, [16.0, -0.25, -0.23, -0.31, -0.65])
+env3 = TetrisEngine(5, 9, [20.0, -0.25, -0.23, -0.31, -0.65])
 
-trainer = Trainer(env, 5)
-trainer2 = Trainer(env1, 5)
-# trainer3 = Trainer(env2, 400)
+trainer  = Trainer(env,  400)
+trainer2 = Trainer(env1, 400)
+trainer3 = Trainer(env2, 400)
+trainer4 = Trainer(env3, 400)
 
-start = time.time()
-steps = trainer.train()
-steps2 = trainer2.train()
-# steps3 = trainer3.train()
-end = time.time()
+scr1 = []
+for i in range(5):
+    start = time.time()
+    steps = trainer.train()
+    end = time.time()
+    print(steps)
+    scr1.append(steps)
+    print(end - start)
+print(np.mean(scr1))
+print(np.var(scr1))
 
-print(steps)
-print(steps2)
-# print(steps3)
-print(end - start)
+scr2 = []
+for i in range(5):
+    start = time.time()
+    steps2 = trainer2.train()
+    end = time.time()
+    print(steps2)
+    scr2.append(steps2)
+    print(end - start)
+print(np.mean(scr2))
+print(np.var(scr2))
+
+scr3= []
+for i in range(5):
+    start = time.time()
+    steps3 = trainer3.train()
+    end = time.time()
+    print(steps3)
+    scr3.append(steps3)
+    print(end - start)
+print(np.mean(scr3))
+print(np.var(scr3))
+
+
+
+
+
+
+
