@@ -36,6 +36,9 @@ class GeneticEngineGenerator:
         for i in range(cycle):
             print("simulate: ", i)
             self.play_all_engines()
+            print("generation: ", i)
+            for i in self.generations:
+                print("agent: ", i[0], "env: ", i[1])
             self.eliminate_engines()
             self.cross_over_and_multiply()
         print("returning best resulting agent env pair")
