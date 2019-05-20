@@ -120,3 +120,6 @@ venv.bak/
 # model
 */*.h5
 *.h5
+
+#graph
+*.png

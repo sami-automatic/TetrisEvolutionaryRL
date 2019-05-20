@@ -157,48 +157,48 @@ class Trainer:
 # checking importance of clear line reward
 #clear_line // height // hole // bumpiness // game_over
 
-env  = TetrisEngine(5, 9, [3.0, -0.25, -0.23, -0.31, -0.65])
-env1 = TetrisEngine(5, 9, [5.0, -0.25, -0.23, -0.31, -0.65])
-env2 = TetrisEngine(5, 9, [16.0, -0.25, -0.23, -0.31, -0.65])
-env3 = TetrisEngine(5, 9, [20.0, -0.25, -0.23, -0.31, -0.65])
+# env  = TetrisEngine(5, 9, [3.0, -0.25, -0.23, -0.31, -0.65])
+# env1 = TetrisEngine(5, 9, [5.0, -0.25, -0.23, -0.31, -0.65])
+# env2 = TetrisEngine(5, 9, [16.0, -0.25, -0.23, -0.31, -0.65])
+# env3 = TetrisEngine(5, 9, [20.0, -0.25, -0.23, -0.31, -0.65])
 
-trainer  = Trainer(env,  400)
-trainer2 = Trainer(env1, 400)
-trainer3 = Trainer(env2, 400)
-trainer4 = Trainer(env3, 400)
+# trainer  = Trainer(env,  400)
+# trainer2 = Trainer(env1, 400)
+# trainer3 = Trainer(env2, 400)
+# trainer4 = Trainer(env3, 400)
 
-scr1 = []
-for i in range(5):
-    start = time.time()
-    steps = trainer.train()
-    end = time.time()
-    print(steps)
-    scr1.append(steps)
-    print(end - start)
-print(np.mean(scr1))
-print(np.var(scr1))
+# scr1 = []
+# for i in range(5):
+#     start = time.time()
+#     steps = trainer.train()
+#     end = time.time()
+#     print(steps)
+#     scr1.append(steps)
+#     print(end - start)
+# print(np.mean(scr1))
+# print(np.var(scr1))
 
-scr2 = []
-for i in range(5):
-    start = time.time()
-    steps2 = trainer2.train()
-    end = time.time()
-    print(steps2)
-    scr2.append(steps2)
-    print(end - start)
-print(np.mean(scr2))
-print(np.var(scr2))
+# scr2 = []
+# for i in range(5):
+#     start = time.time()
+#     steps2 = trainer2.train()
+#     end = time.time()
+#     print(steps2)
+#     scr2.append(steps2)
+#     print(end - start)
+# print(np.mean(scr2))
+# print(np.var(scr2))
 
-scr3= []
-for i in range(5):
-    start = time.time()
-    steps3 = trainer3.train()
-    end = time.time()
-    print(steps3)
-    scr3.append(steps3)
-    print(end - start)
-print(np.mean(scr3))
-print(np.var(scr3))
+# scr3= []
+# for i in range(5):
+#     start = time.time()
+#     steps3 = trainer3.train()
+#     end = time.time()
+#     print(steps3)
+#     scr3.append(steps3)
+#     print(end - start)
+# print(np.mean(scr3))
+# print(np.var(scr3))
 
 
 

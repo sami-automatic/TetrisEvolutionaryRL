@@ -1,66 +1,179 @@
 import numpy as np
 from engine_DQN import TetrisEngine
 from dqnkeras import Trainer
-
-NUMBER_OF_ENGINES = 16
+import random
+import time
+from operator import itemgetter
 
 
 class GeneticEngineGenerator:
     engines = []
-    rewards = []
-    reward_engine_tuple = []
+    generations = []
 
-    def generate_random_engines(self):
+    def generate_random_engines(self, NUMBER_OF_ENGINES=6):
+        print("generate_random_engines")
         for _ in range(NUMBER_OF_ENGINES):
-            parameters = [
+            genes = [
                 # clear_line_reward
-                np.random.uniform(0.1, 30.0),    # 15.0
+                np.random.uniform(0.0, 15.0),    # 15.0
                 # height_penalty
                 np.random.uniform(-0.1, -1.0),   # -0.810066
                 # hole_penalty
-                np.random.uniform(-0.1, -0.5),   # -0.36
+                np.random.uniform(-0.1, -1.0),   # -0.36
                 # bumpiness_penalty
-                np.random.uniform(-0.1, -0.5),   # -0.18
+                np.random.uniform(-0.1, -1.0),   # -0.18
                 # game_over_penalty
-                np.random.uniform(-0.1, -0.5)   # -0.86
+                np.random.uniform(-0.1, -1.0)    # -0.86
             ]
-            print("Creating engine with parameters..", parameters)
-            engine = TetrisEngine(5, 9, parameters)
-            self.engines.append(engine)
+            print("Creating engine with genes...", genes)
+            engine = TetrisEngine(5, 9, genes)
+            # self.engines.append(engine)
+            self.generations.append([[0, 0, 0], engine])
 
-    def simulate(self, times):
-        for _ in range(times):
+    def simulate(self, cycle):
+        for i in range(cycle):
+            print("simulate: ", i)
             self.play_all_engines()
             self.eliminate_engines()
             self.cross_over_and_multiply()
 
     def play_all_engines(self):
-        for engine in self.engines:
-            reward = self.train_with_trainer(engine)
-            self.rewards.append(reward)
+        print("play_all_engines")
+        # generation = []
+        for i in self.generations:
+            agent = i[0]
+            if (agent == [0, 0, 0]):
+                engine = i[1]
+                print("engine")
+                print(engine)
+                mean, variance, std = self.train_with_trainer(engine, 2, 5)
+                print("play_all_engines mean, variance, std")
+                print(mean, variance, std)
+                agent = [mean, variance, std]
+                i[0] = agent
+                # generation.append((agent, engine))
+        # print("Printing generation......")
+        # print(generation)
+        # self.generations.append(generation)
 
     def eliminate_engines(self):
-        zipped = zip(self.rewards, self.engines)
-        reward_engine_list = list(zipped)
-        self.reward_engine_tuple = reward_engine_list[:]
-        self.reward_engine_tuple = sorted(
-            self.reward_engine_tuple, key=lambda x: x[0], reverse=True)
-        self.engines = [self.reward_engine_tuple[i][1]
-                   for i in range(NUMBER_OF_ENGINES // 2 + 1)]
+        print("eliminate_engines")
+
+        for i in self.generations:
+            print("agent is")
+            print(i[0])
+            print("")
+
+        for i in self.generations:
+            print("==========")
+            print("GENERATION")
+            print("agent is")
+            print(i[0])
+            print("printing agent's engine")
+            print(i[1])
+            print("==========")
+        self.last_generation = self.generations[-1]
+        print("last_generation agent")
+        print(self.last_generation[0])
+        print("last_generation env")
+        print(self.last_generation[1])
+        # np.sort(self.last_generation, axis=0)  # sort according to mean
+        self.generations.sort(key=lambda x: x[0][0], reverse=True)
+        del self.generations[2:]  # keep the first two kill others
+        print("after deletion generations")
+        print(self.generations)
+        for i in self.generations:
+            print("==========")
+            print("GENERATION")
+            print("agent is")
+            print(i[0])
+            print("printing agent's engine")
+            print(i[1])
+            print("==========")
 
     def cross_over_and_multiply(self):
-        for i in range(len(self.engines) - 1, 2):
-            top = self.engines[i]
-            bottom = self.engines[i + 1]
+        print("cross_over_and_multiply")
+        # print("old engines")
+        # print("==============")
+        # for i in self.engines:
+        #     print("printing engine: ")
+        #     print(i)
+        # print("==============")
+        # print("for range in len(self.engines) - 1")
+        # print(len(self.engines) - 1)
+        # for i in range(len(self.engines) - 1, 2):
+        #     top = self.engines[i]
+        #     bottom = self.engines[i + 1]
+        #     lhs = top.get_genes()
+        #     rhs = bottom.get_genes()
+        #     shuffled_genes = [lhs[x] if np.random.randint(
+        #         0, 9) % 2 == 0 else rhs[x] for x in range(8)]
+        #     print("shuffled_genes")
+        #     print(shuffled_genes)
+        #     exposed_genes = self.expose_to_mutation(shuffled_genes)
+        #     print("exposed_genes")
+        #     print(exposed_genes)
+        #     offspring = TetrisEngine(5, 9, exposed_genes)
+        #     print("offspring")
+        #     print(offspring)
+        #     self.engines.append(offspring)
+        #     print("self.engines after appending offspring")
+        #     print("==============")
+        #     for i in self.engines:
+        #         print("printing engine: ")
+        #         print(i)
+        #     print("==============")
+        print("old engines")
+        print("==============")
+        for i in self.generations:
+            eng = i[1]
+            print("printing engine: ")
+            print(eng)
+        print("==============")
+        ln = len(self.generations)
+        print("generations length: ")
+        print(ln)
+        for i in range(ln):
+            top = self.generations[i][1]
+            print("top", top)
+            bottom = self.generations[i + 1][1]
+            print("bottom", bottom)
             lhs = top.get_genes()
+            print("lhs", lhs)
             rhs = bottom.get_genes()
+            print("rhs", rhs)
             shuffled_genes = [lhs[x] if np.random.randint(
-                0, 9) % 2 == 0 else rhs[x] for x in range(8)]
+                0, 9) % 2 == 0 else rhs[x] for x in range(5)]
+            print("shuffled_genes")
+            print(shuffled_genes)
             exposed_genes = self.expose_to_mutation(shuffled_genes)
+            print("exposed_genes")
+            print(exposed_genes)
             offspring = TetrisEngine(5, 9, exposed_genes)
-            self.engines.append(offspring)
+            print("offspring")
+            print(offspring)
+            self.generations.append([[0, 0, 0], offspring])
+            print("self.generations after appending offspring")
+            print("==============")
+            for i in self.generations:
+                agent = i[0]
+                print("agent", agent)
+                eng = i[1]
+                print("printing engine: ")
+                print(eng)
+            print("==============")
+
+        print("cross_over_and_multiply finished")
+        print("new engines")
+        print("==============")
+        for i in self.generations:
+            eng = i[1]
+            print("printing engine: ")
+            print(eng)
+        print("==============")
 
     def expose_to_mutation(self, genes):
+        print("expose_to_mutation")
         exposed_genes = []
         for gene in genes:
             mutation_happened = np.random.randint(0, 9) == 9
@@ -70,36 +183,36 @@ class GeneticEngineGenerator:
                 exposed_genes.append(gene)
         return exposed_genes
 
-    def train_with_trainer(self, env):
-        trainer = Trainer(env, 50)
-        reward = trainer.train()
-        return reward
+    def train_with_trainer(self, env, times=5, num_games=400):
+        print("train_with_trainer")
+        trainer = Trainer(env, num_games)
+        all_steps = []
 
-    def play_with(self, which = "Best"):
-        index = 0 if which is "Best" else -1
-        env = self.engines[index]
-        print(which, "engine has genes", self.engines[index].get_genes())
-        play_with_trained_model(env)
+        for i in range(times):
+            start = time.time()
+            n_steps = trainer.train()
+            print("N_steps")
+            print(n_steps)
+            end = time.time()
+            all_steps.append(n_steps)
+            print("all_steps")
+            print(all_steps)
+            print("Printing time in round")
+            print(i)
+            print("While my environment is")
+            print(env)
+            print(end - start)
 
+        print("calculating mean variance and std from this..")
+        print(all_steps)
+        mean = np.mean(all_steps)
+        variance = np.var(all_steps)
+        std = np.std(all_steps)
+        print("mean", mean)
+        print("variance", variance)
+        print("std", std)
+        return mean, variance, std
 
-    def play_with_trained_model(self, env):
-        model = load_model(str(env))
-        state = env.clear()
-        done = False
-        cumulative_reward = 0
-        n_actions_taken = 0
-        while not done:
-            n_actions_taken += 1
-            state_shaped = np.reshape(state, [1, 45])
-            action_vals = model.predict(state_shaped)
-            action = np.argmax(action_vals[0])
-            next_state, reward, done, _ = env.step(action)
-            next_state_shaped = np.reshape(next_state, [1, 45])
-            cumulative_reward += reward
-            state = next_state
-            plt.imshow(np.rot90(state, 3))
-            plt.show()
-        return cumulative_reward
 
 generator = GeneticEngineGenerator()
 generator.generate_random_engines()
