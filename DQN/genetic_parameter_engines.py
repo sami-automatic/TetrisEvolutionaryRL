@@ -36,6 +36,8 @@ class GeneticEngineGenerator:
             self.play_all_engines()
             self.eliminate_engines()
             self.cross_over_and_multiply()
+        print("returning best resulting env")
+        return self.generations[0][1]
 
     def play_all_engines(self):
         print("play_all_engines")
@@ -136,8 +138,10 @@ class GeneticEngineGenerator:
         for i in range(ln):
             top = self.generations[i][1]
             print("top", top)
+            print("top agent", self.generations[i][0])
             bottom = self.generations[i + 1][1]
             print("bottom", bottom)
+            print("bottom agent", self.generations[i + 1][0])
             lhs = top.get_genes()
             print("lhs", lhs)
             rhs = bottom.get_genes()
@@ -214,8 +218,8 @@ class GeneticEngineGenerator:
         return mean, variance, std
 
 
-generator = GeneticEngineGenerator()
-generator.generate_random_engines()
-generator.simulate(10)
-# generator.play_with("Best")
-# generator.play_with("Worst")
+if __name__ == "__main__":
+    generator = GeneticEngineGenerator()
+    generator.generate_random_engines()
+    best_env = generator.simulate(2)
+    print("Best performed env is...", best_env)
