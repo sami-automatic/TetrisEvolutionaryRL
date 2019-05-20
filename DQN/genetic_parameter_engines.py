@@ -7,15 +7,17 @@ from operator import itemgetter
 
 
 class GeneticEngineGenerator:
+    n_of_engines = 6
     engines = []
     generations = []
 
     def generate_random_engines(self, NUMBER_OF_ENGINES=6):
+        self.n_of_engines = NUMBER_OF_ENGINES
         print("generate_random_engines")
         for _ in range(NUMBER_OF_ENGINES):
             genes = [
                 # clear_line_reward
-                np.random.uniform(0.0, 15.0),    # 15.0
+                np.random.uniform(0.0, 20.0),    # 15.0
                 # height_penalty
                 np.random.uniform(-0.1, -1.0),   # -0.810066
                 # hole_penalty
@@ -36,27 +38,22 @@ class GeneticEngineGenerator:
             self.play_all_engines()
             self.eliminate_engines()
             self.cross_over_and_multiply()
-        print("returning best resulting env")
-        return self.generations[0][1]
+        print("returning best resulting agent env pair")
+        return self.generations[0]
 
     def play_all_engines(self):
         print("play_all_engines")
-        # generation = []
         for i in self.generations:
             agent = i[0]
             if (agent == [0, 0, 0]):
                 engine = i[1]
                 print("engine")
                 print(engine)
-                mean, variance, std = self.train_with_trainer(engine, 2, 5)
+                mean, variance, std = self.train_with_trainer(engine)
                 print("play_all_engines mean, variance, std")
                 print(mean, variance, std)
                 agent = [mean, variance, std]
                 i[0] = agent
-                # generation.append((agent, engine))
-        # print("Printing generation......")
-        # print(generation)
-        # self.generations.append(generation)
 
     def eliminate_engines(self):
         print("eliminate_engines")
@@ -95,36 +92,6 @@ class GeneticEngineGenerator:
 
     def cross_over_and_multiply(self):
         print("cross_over_and_multiply")
-        # print("old engines")
-        # print("==============")
-        # for i in self.engines:
-        #     print("printing engine: ")
-        #     print(i)
-        # print("==============")
-        # print("for range in len(self.engines) - 1")
-        # print(len(self.engines) - 1)
-        # for i in range(len(self.engines) - 1, 2):
-        #     top = self.engines[i]
-        #     bottom = self.engines[i + 1]
-        #     lhs = top.get_genes()
-        #     rhs = bottom.get_genes()
-        #     shuffled_genes = [lhs[x] if np.random.randint(
-        #         0, 9) % 2 == 0 else rhs[x] for x in range(8)]
-        #     print("shuffled_genes")
-        #     print(shuffled_genes)
-        #     exposed_genes = self.expose_to_mutation(shuffled_genes)
-        #     print("exposed_genes")
-        #     print(exposed_genes)
-        #     offspring = TetrisEngine(5, 9, exposed_genes)
-        #     print("offspring")
-        #     print(offspring)
-        #     self.engines.append(offspring)
-        #     print("self.engines after appending offspring")
-        #     print("==============")
-        #     for i in self.engines:
-        #         print("printing engine: ")
-        #         print(i)
-        #     print("==============")
         print("old engines")
         print("==============")
         for i in self.generations:
@@ -135,17 +102,13 @@ class GeneticEngineGenerator:
         ln = len(self.generations)
         print("generations length: ")
         print(ln)
-        for i in range(ln):
-            top = self.generations[i][1]
-            print("top", top)
-            print("top agent", self.generations[i][0])
-            bottom = self.generations[i + 1][1]
-            print("bottom", bottom)
-            print("bottom agent", self.generations[i + 1][0])
-            lhs = top.get_genes()
-            print("lhs", lhs)
-            rhs = bottom.get_genes()
-            print("rhs", rhs)
+        top = self.generations[0][1]
+        bottom = self.generations[1][1]
+        lhs = top.get_genes()
+        print("lhs", lhs)
+        rhs = bottom.get_genes()
+        print("rhs", rhs)
+        for i in range(2, self.n_of_engines):
             shuffled_genes = [lhs[x] if np.random.randint(
                 0, 9) % 2 == 0 else rhs[x] for x in range(5)]
             print("shuffled_genes")
@@ -179,10 +142,15 @@ class GeneticEngineGenerator:
     def expose_to_mutation(self, genes):
         print("expose_to_mutation")
         exposed_genes = []
-        for gene in genes:
-            mutation_happened = np.random.randint(0, 9) == 9
+        for i, gene in enumerate(genes):
+            mutation_happened = np.random.randint(0, 100) < 13
             if mutation_happened:
-                exposed_genes.append(np.random.uniform(-10.0, 10.0))
+                print("mutation happened in index: ", i)
+                val = [-0.1, -1.0]
+                if (i == 0):
+                    val = [0.0, 20.0]
+                print("uniform between", val)
+                exposed_genes.append(np.random.uniform(val[0], val[1]))
             else:
                 exposed_genes.append(gene)
         return exposed_genes
@@ -195,16 +163,8 @@ class GeneticEngineGenerator:
         for i in range(times):
             start = time.time()
             n_steps = trainer.train()
-            print("N_steps")
-            print(n_steps)
             end = time.time()
             all_steps.append(n_steps)
-            print("all_steps")
-            print(all_steps)
-            print("Printing time in round")
-            print(i)
-            print("While my environment is")
-            print(env)
             print(end - start)
 
         print("calculating mean variance and std from this..")
@@ -220,6 +180,7 @@ class GeneticEngineGenerator:
 
 if __name__ == "__main__":
     generator = GeneticEngineGenerator()
-    generator.generate_random_engines()
-    best_env = generator.simulate(2)
-    print("Best performed env is...", best_env)
+    generator.generate_random_engines(10)
+    best_agent_env_pair = generator.simulate(10)
+    print("Best performed agent is...", best_agent_env_pair[0])
+    print("Best performed env is...", best_agent_env_pair[1])
