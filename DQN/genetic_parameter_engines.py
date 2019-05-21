@@ -49,6 +49,7 @@ class GeneticEngineGenerator:
 
     def worker(self, engine, i, queue):
         print("worker process started for: ", engine, "in index: ", i, flush=True)
+        # INFO: change these variables in terms of determine times and games
         mean, variance, std = self.train_with_trainer(engine, 10, 10)
         print("worker process finished:  mean, variance, std", flush=True)
         print(mean, variance, std, flush=True)
@@ -211,7 +212,9 @@ class GeneticEngineGenerator:
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     generator = GeneticEngineGenerator()
+    # INFO: change this variable to set random of engines in each generation
     generator.generate_random_engines(5)
+    # INFO: change this variable to set generation
     best_agent_env_pair = generator.simulate(10)
     print("Best performed agent is...", best_agent_env_pair[0], flush=True)
     print("Best performed env is...", best_agent_env_pair[1], flush=True)
