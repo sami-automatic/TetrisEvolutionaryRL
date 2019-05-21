@@ -6,10 +6,18 @@ from keras.callbacks import deque
 from keras.models import load_model
 import random
 import time
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from engine_DQN import TetrisEngine
+import tensorflow as tf
+import string
+import keras as K
 from functools import reduce
 
+# make sure soft-placement is off
+tf_config = tf.ConfigProto(allow_soft_placement=False)
+tf_config.gpu_options.allow_growth = True
+s = tf.Session(config=tf_config)
+K.backend.set_session(s)
 
 class DQNAgent:
 
@@ -31,12 +39,13 @@ class DQNAgent:
 
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
-        model = Sequential()
-        model.add(Dense(64, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(64, activation='relu'))
-        model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse',
-                      optimizer=Adam(lr=self.learning_rate))
+        with tf.device('/gpu:0'):
+            model = Sequential()
+            model.add(Dense(64, input_dim=self.state_size, activation='relu'))
+            model.add(Dense(64, activation='relu'))
+            model.add(Dense(self.action_size, activation='linear'))
+            model.compile(loss='mse',
+                        optimizer=Adam(lr=self.learning_rate))
         return model
 
     def remember(self, state, action, reward, next_state, done):
@@ -66,7 +75,7 @@ class DQNAgent:
 
         general_state = np.reshape(general_state, (-1, 45))
         general_target = np.reshape(general_target, (-1, 7))
-        self.model.fit(general_state, general_target, epochs=1, verbose=0)
+        self.model.fit(general_state, general_target, batch_size=batch_size, epochs=1, verbose=0)      
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
@@ -78,11 +87,11 @@ class Trainer:
         self.nb_games = nb_games
 
     def train(self):
-        fig = plt.figure()
-        fig.show()
-        ax = fig.add_subplot(111)
+        # fig = plt.figure()
+        # fig.show()
+        # ax = fig.add_subplot(111)
 
-        print("Playing with", self.env)
+        print("Playing with", self.env, flush=True)
         # initialize gym environment and the agent
         batch_size = 64
         state_size = self.env.height * self.env.width
@@ -120,89 +129,33 @@ class Trainer:
             rewards.append(cumulative_reward)
             y.append(n_actions_taken)
 
-            ax.plot(x, y, color='b')
-            fig.canvas.draw()
+            # ax.plot(x, y, color='b')
+            # fig.canvas.draw()
             time.sleep(0.1)
-            print("cumulative reward: ", '{:.3}'.format(cumulative_reward),
-                  "\tepsilon: ",  '{:.6}'.format(agent.epsilon),
-                  "\tepisode: ", g,
-                  "\tnumber_actions: ", n_actions_taken)
-
+            # print("cumulative reward: ", '{:.3}'.format(cumulative_reward),
+            #       "\tepsilon: ",  '{:.6}'.format(agent.epsilon),
+            #       "\tepisode: ", g,
+            #       "\tnumber_actions: ", n_actions_taken, flush=True)
             model_name = "model_%s.h5" % (self.env)
-            agent.model.save(model_name)
-        plt.show(block = False)
-        plt.savefig('model_%s.png' % (self.env))
-        plt.close('all')
-        return self.get_survived_steps(model_name)
-
-    def get_survived_steps(self, model_name):
-        model = load_model(model_name)
-        env = TetrisEngine(5, 9)
-        state = env.clear()
+            try:
+                agent.model.save(model_name)
+            except:
+                print("COULDN'T SAVE MODEL")
+        # plt.show(block = False)
+        # plt.savefig('model_%s.png' % (self.env))
+        # plt.close('all')
+        state = self.env.clear()
         done = False
         cumulative_reward = 0
         n_actions_taken = 0
         while not done:
             n_actions_taken += 1
             state_shaped = np.reshape(state, [1, 45])
-            action_vals = model.predict(state_shaped)
+            action_vals = agent.model.predict(state_shaped)
             action = np.argmax(action_vals[0])
-            next_state, reward, done, _ = env.step(action)
+            next_state, reward, done, _ = self.env.step(action)
             next_state_shaped = np.reshape(next_state, [1, 45])
             cumulative_reward += reward
             state = next_state
+        print("survived model n_actions_taken", n_actions_taken, flush=True)
         return n_actions_taken
-
-
-# checking importance of clear line reward
-#clear_line // height // hole // bumpiness // game_over
-
-# env  = TetrisEngine(5, 9, [3.0, -0.25, -0.23, -0.31, -0.65])
-# env1 = TetrisEngine(5, 9, [5.0, -0.25, -0.23, -0.31, -0.65])
-# env2 = TetrisEngine(5, 9, [16.0, -0.25, -0.23, -0.31, -0.65])
-# env3 = TetrisEngine(5, 9, [20.0, -0.25, -0.23, -0.31, -0.65])
-
-# trainer  = Trainer(env,  400)
-# trainer2 = Trainer(env1, 400)
-# trainer3 = Trainer(env2, 400)
-# trainer4 = Trainer(env3, 400)
-
-# scr1 = []
-# for i in range(5):
-#     start = time.time()
-#     steps = trainer.train()
-#     end = time.time()
-#     print(steps)
-#     scr1.append(steps)
-#     print(end - start)
-# print(np.mean(scr1))
-# print(np.var(scr1))
-
-# scr2 = []
-# for i in range(5):
-#     start = time.time()
-#     steps2 = trainer2.train()
-#     end = time.time()
-#     print(steps2)
-#     scr2.append(steps2)
-#     print(end - start)
-# print(np.mean(scr2))
-# print(np.var(scr2))
-
-# scr3= []
-# for i in range(5):
-#     start = time.time()
-#     steps3 = trainer3.train()
-#     end = time.time()
-#     print(steps3)
-#     scr3.append(steps3)
-#     print(end - start)
-# print(np.mean(scr3))
-# print(np.var(scr3))
-
-
-
-
-
-
-

@@ -106,7 +106,7 @@ class TetrisEngine:
         self.clear()
 
     def __str__(self):
-        return "ENGINE_%s_%s_%s_%s_%s\n" % (self.clear_line_reward,
+        return "ENGINE_%s_%s_%s_%s_%s" % (self.clear_line_reward,
                                              self.height_penalty,
                                              self.hole_penalty,
                                              self.bumpiness_penalty,
@@ -234,13 +234,12 @@ class TetrisEngine:
                            int(self.anchor[1] + j)] = on
 
     def __repr__(self):
-        self._set_piece(True)
-        s = 'o' + '-' * self.width + 'o\n'
-        s += '\n'.join(['|' + ''.join(['X' if j else ' ' for j in i]
-                                      ) + '|' for i in self.board.T])
-        s += '\no' + '-' * self.width + 'o'
-        self._set_piece(False)
-        return s
+        return "ENGINE_%s_%s_%s_%s_%s" % (self.clear_line_reward,
+                                             self.height_penalty,
+                                             self.hole_penalty,
+                                             self.bumpiness_penalty,
+                                             self.game_over_penalty,
+                                             )
 
     def calculate_score(self, board, cleared, done):
         holes_score = self.calculate_holes(board)
