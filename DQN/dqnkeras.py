@@ -14,10 +14,11 @@ import keras as K
 from functools import reduce
 
 # make sure soft-placement is off
-tf_config = tf.ConfigProto(allow_soft_placement=False)
-tf_config.gpu_options.allow_growth = True
-s = tf.Session(config=tf_config)
-K.backend.set_session(s)
+# tf_config = tf.ConfigProto(allow_soft_placement=False)
+# tf_config.gpu_options.allow_growth = True
+# s = tf.Session(config=tf_config)
+# K.backend.set_session(s)
+
 
 class DQNAgent:
 
@@ -39,13 +40,13 @@ class DQNAgent:
 
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
-        with tf.device('/gpu:0'):
-            model = Sequential()
-            model.add(Dense(64, input_dim=self.state_size, activation='relu'))
-            model.add(Dense(64, activation='relu'))
-            model.add(Dense(self.action_size, activation='linear'))
-            model.compile(loss='mse',
-                        optimizer=Adam(lr=self.learning_rate))
+        # with tf.device('/gpu:0'):
+        model = Sequential()
+        model.add(Dense(64, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(64, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
+        model.compile(loss='mse',
+                      optimizer=Adam(lr=self.learning_rate))
         return model
 
     def remember(self, state, action, reward, next_state, done):
@@ -75,14 +76,15 @@ class DQNAgent:
 
         general_state = np.reshape(general_state, (-1, 45))
         general_target = np.reshape(general_target, (-1, 7))
-        self.model.fit(general_state, general_target, batch_size=batch_size, epochs=1, verbose=0)      
+        self.model.fit(general_state, general_target,
+                       batch_size=batch_size, epochs=1, verbose=0)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
 
 class Trainer:
-    def __init__(self, env, nb_games = 10000):
+    def __init__(self, env, nb_games=10000):
         self.env = env
         self.nb_games = nb_games
 

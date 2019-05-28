@@ -67,7 +67,7 @@ def idle(shape, anchor, board):
 
 class TetrisEngine:
     def __init__(self, width, height, genes=[15.0, -0.810066, -0.36, -0.18, -0.86], board=[]):
-        print("TetrisEngine genes", genes)
+        # print("TetrisEngine genes", genes)
         self.width = width
         self.height = height
         self.board = np.asarray(board, dtype=np.float32) if len(board) > 0 else np.zeros(
@@ -107,11 +107,11 @@ class TetrisEngine:
 
     def __str__(self):
         return "ENGINE_%s_%s_%s_%s_%s" % (self.clear_line_reward,
-                                             self.height_penalty,
-                                             self.hole_penalty,
-                                             self.bumpiness_penalty,
-                                             self.game_over_penalty,
-                                             )
+                                          self.height_penalty,
+                                          self.hole_penalty,
+                                          self.bumpiness_penalty,
+                                          self.game_over_penalty,
+                                          )
 
     def get_genes(self):
         return [
@@ -235,11 +235,11 @@ class TetrisEngine:
 
     def __repr__(self):
         return "ENGINE_%s_%s_%s_%s_%s" % (self.clear_line_reward,
-                                             self.height_penalty,
-                                             self.hole_penalty,
-                                             self.bumpiness_penalty,
-                                             self.game_over_penalty,
-                                             )
+                                          self.height_penalty,
+                                          self.hole_penalty,
+                                          self.bumpiness_penalty,
+                                          self.game_over_penalty,
+                                          )
 
     def calculate_score(self, board, cleared, done):
         holes_score = self.calculate_holes(board)
